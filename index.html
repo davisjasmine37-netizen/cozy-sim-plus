@@ -1,118 +1,147 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>Cozy Life — Glow-Up v2</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Cozy Life — 3D Mobile</title>
 <style>
   *{box-sizing:border-box}html,body{height:100%;margin:0}
-  body{background:#0e141b;color:#e7ecf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-  header,footer{position:fixed;left:0;right:0;background:#111826;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;z-index:5}
+  body{background:#0e141b;color:#e7ecf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;overflow:hidden}
+  header,footer{position:fixed;left:0;right:0;background:#111826;display:flex;justify-content:space-between;align-items:center;padding:10px 12px;z-index:9}
   header{top:0;box-shadow:0 2px 12px rgba(0,0,0,.35)}
-  footer{bottom:0;gap:8px;justify-content:center}
-  main{position:fixed;left:0;right:0;top:56px;bottom:104px;display:flex;flex-direction:column;gap:10px;padding:10px}
-
-  #stage{position:relative;flex:1}
-  #game{width:100%;height:100%;border-radius:16px;background:#0a1016;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px rgba(0,0,0,.45)}
-
-  #hud{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  footer{bottom:0;gap:8px;justify-content:center;flex-wrap:wrap}
+  #ui{position:fixed;left:0;right:0;top:56px;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;z-index:8}
   .bar{display:flex;align-items:center;gap:10px}
-  .bar label{width:84px;opacity:.85}
-  .meter{flex:1;height:12px;background:#16202b;border-radius:999px;overflow:hidden}
+  .bar label{width:80px;opacity:.85}
+  .meter{flex:1;height:10px;background:#16202b;border-radius:999px;overflow:hidden}
   .meter span{display:block;height:100%;background:linear-gradient(90deg,#4fd1ff,#7cffb2)}
-
-  #tabs{display:flex;gap:8px;flex-wrap:wrap}
-  #tabs button{padding:12px 14px;border:0;border-radius:12px;background:#17212c;color:#e7ecf2;font-size:15px}
+  #tabs{position:fixed;left:10px;right:10px;top:calc(56px + 100px);display:flex;gap:8px;z-index:8;flex-wrap:wrap}
+  #tabs button{padding:10px 12px;border:0;border-radius:12px;background:#17212c;color:#e7ecf2}
   #tabs button.active{outline:2px solid rgba(255,255,255,.15)}
-  .panel{display:none}.panel.active{display:block}
+  .panel{position:fixed;left:10px;right:10px;bottom:74px;background:#0f151d;border-radius:14px;padding:10px;display:none;z-index:8}
+  .panel.active{display:block}
   .grid-acts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-  .grid-acts button{padding:12px;border:0;border-radius:12px;background:#17212c;color:#e7ecf2;font-size:15px}
-  .list{display:grid;grid-template-columns:1fr;gap:8px}
-  .card{display:flex;justify-content:space-between;align-items:center;background:#0f151d;border-radius:12px;padding:10px 12px}
+  .card{display:flex;justify-content:space-between;align-items:center;background:#0f151d;border-radius:12px;padding:10px 12px;margin-bottom:8px}
   .card .name{font-weight:700}.card .meta{opacity:.85;font-size:13px}
-  .card button{padding:8px 12px;border:0;border-radius:10px;background:#1a2532;color:#e7ecf2}
-
-  #joy{position:absolute;left:18px;bottom:130px;width:128px;height:128px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);touch-action:none;display:none;z-index:3}
-  #knob{position:absolute;left:50%;top:50%;width:58px;height:58px;border-radius:999px;transform:translate(-50%,-50%);background:rgba(255,255,255,.28)}
-  #act{position:absolute;right:18px;bottom:130px;padding:12px 16px;border:0;border-radius:12px;background:#1a2532;color:#e7ecf2;display:none;z-index:3}
-
-  #toast{position:fixed;left:50%;top:22%;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:10px 14px;border-radius:10px;backdrop-filter:blur(8px);z-index:9}
+  .badge{display:inline-block;background:#1a2330;padding:2px 8px;border-radius:999px;font-size:12px}
+  #rooms{position:fixed;right:10px;top:56px;display:flex;gap:6px;z-index:8}
+  #rooms button{padding:8px 10px;border:0;border-radius:10px;background:#1a2330;color:#e7ecf2;font-size:12px}
+  #toast{position:fixed;left:50%;top:22%;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:10px 14px;border-radius:10px;backdrop-filter:blur(8px);z-index:99}
+  canvas.webgl{position:fixed;inset:0}
 </style>
 </head>
 <body>
 <header>
-  <div>Cozy Life <span style="background:#1a2330;padding:2px 8px;border-radius:999px">Glow-Up</span></div>
+  <div>Cozy Life <span class="badge">3D</span></div>
   <div><span id="clock">7:00 AM</span> • <span id="jobLabel">Unemployed</span> • $<span id="money">120</span></div>
 </header>
 
-<main>
-  <div id="stage">
-    <canvas id="game" aria-label="Apartment"></canvas>
-    <div id="joy"><div id="knob"></div></div>
-    <button id="act">Interact</button>
+<!-- Needs -->
+<div id="ui">
+  <div class="bar"><label>Energy</label><div class="meter"><span id="energy"></span></div></div>
+  <div class="bar"><label>Hunger</label><div class="meter"><span id="hunger"></span></div></div>
+  <div class="bar"><label>Fun</label><div class="meter"><span id="fun"></span></div></div>
+  <div class="bar"><label>Clean</label><div class="meter"><span id="clean"></span></div></div>
+  <div class="bar"><label>Edu</label><div class="meter"><span id="edu"></span></div></div>
+  <div class="bar"><label>Rep</label><div class="meter"><span id="rep"></span></div></div>
+</div>
+
+<!-- Quick room buttons -->
+<div id="rooms">
+  <button data-room="living">Living</button>
+  <button data-room="kitchen">Kitchen</button>
+  <button data-room="bathroom">Bathroom</button>
+  <button data-room="bedroom">Bedroom</button>
+</div>
+
+<!-- Tabs -->
+<section id="tabs">
+  <button data-tab="actions" class="active">Actions</button>
+  <button data-tab="jobs">Jobs</button>
+  <button data-tab="relationships">Relationships</button>
+  <button data-tab="me">Me</button>
+</section>
+
+<!-- Panels -->
+<section id="panel-actions" class="panel active">
+  <div class="grid-acts" id="actions">
+    <button data-act="eat">Eat 🍲</button>
+    <button data-act="sleep">Sleep 🛏️</button>
+    <button data-act="shower">Shower 🚿</button>
+    <button data-act="tv">Watch TV 📺</button>
+    <button data-act="study">Study 📚</button>
+    <button data-act="work">Work 💼</button>
+    <button data-act="clean">Clean 🧹</button>
+    <button data-act="save">Save 💾</button>
   </div>
+  <div style="opacity:.75;font-size:12px;margin-top:6px">Tap the floor to move. Tap near a door to change rooms.</div>
+</section>
 
-  <section id="hud">
-    <div class="bar"><label>Energy</label><div class="meter"><span id="energy"></span></div></div>
-    <div class="bar"><label>Hunger</label><div class="meter"><span id="hunger"></span></div></div>
-    <div class="bar"><label>Fun</label><div class="meter"><span id="fun"></span></div></div>
-    <div class="bar"><label>Clean</label><div class="meter"><span id="clean"></span></div></div>
-    <div class="bar"><label>Edu</label><div class="meter"><span id="edu"></span></div></div>
-    <div class="bar"><label>Rep</label><div class="meter"><span id="rep"></span></div></div>
-  </section>
+<section id="panel-jobs" class="panel">
+  <div id="jobsList"></div>
+</section>
 
-  <section id="tabs">
-    <button data-tab="actions" class="active">Actions</button>
-    <button data-tab="jobs">Jobs</button>
-    <button data-tab="relationships">Relationships</button>
-    <button data-tab="me">Me</button>
-  </section>
-
-  <section id="panel-actions" class="panel active">
-    <div class="grid-acts" id="actions">
-      <button data-act="eat">Eat 🍲</button>
-      <button data-act="sleep">Sleep 🛏️</button>
-      <button data-act="shower">Shower 🚿</button>
-      <button data-act="tv">Watch TV 📺</button>
-      <button data-act="study">Study 📚</button>
-      <button data-act="work">Work 💼</button>
-      <button data-act="clean">Clean 🧹</button>
-      <button data-act="save">Save 💾</button>
+<section id="panel-relationships" class="panel">
+  <div id="npcList"></div>
+  <div class="card" id="npcActions" style="display:none">
+    <div id="npcName">—</div>
+    <div style="display:flex;gap:8px">
+      <button class="mini" data-npc="chat">Chat 💬</button>
+      <button class="mini" data-npc="compliment">Compliment 🌟</button>
+      <button class="mini" data-npc="gift">Gift 🎁 ($25)</button>
+      <button class="mini" data-npc="date">Ask Out ❤️ ($40)</button>
     </div>
-    <div class="hint" style="opacity:.75;font-size:12px;margin-top:6px">Tap the floor or use the joystick. Press <b>Interact</b> near bed/TV/shower/kitchen or an NPC.</div>
-  </section>
+  </div>
+</section>
 
-  <section id="panel-jobs" class="panel">
-    <div class="list" id="jobsList"></div>
-    <div class="hint" style="opacity:.75;font-size:12px;margin-top:6px">Get hired, then use <b>Work</b> during open hours.</div>
-  </section>
-
-  <section id="panel-relationships" class="panel">
-    <div class="list" id="npcList"></div>
-    <div class="card" id="npcActions" style="display:none">
-      <div id="npcName">—</div>
-      <div style="display:flex;gap:8px">
-        <button class="mini" data-npc="chat">Chat 💬</button>
-        <button class="mini" data-npc="compliment">Compliment 🌟</button>
-        <button class="mini" data-npc="gift">Gift 🎁 ($25)</button>
-        <button class="mini" data-npc="date">Ask Out ❤️ ($40)</button>
-      </div>
+<section id="panel-me" class="panel">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div>
+      <div style="margin-bottom:6px">Skin tone</div>
+      <select id="skin" style="width:100%;padding:8px;border:0;border-radius:8px;background:#17212c;color:#e7ecf2">
+        <option value="#2c1f16" selected>Deep brown</option>
+        <option value="#3b2a1d">Warm brown</option>
+        <option value="#5a3b2b">Brown</option>
+        <option value="#7a543e">Tan</option>
+        <option value="#a1765c">Light tan</option>
+      </select>
     </div>
-  </section>
-
-  <section id="panel-me" class="panel">
-    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-      <span style="background:#1a2330;padding:2px 8px;border-radius:999px">Time speed</span>
-      <input id="time" type="range" min="0.5" max="6" step="0.5" value="2" style="width:180px">
-      <span id="timeLbl" style="background:#1a2330;padding:2px 8px;border-radius:999px">2 min/sec</span>
-      <span style="background:#1a2330;padding:2px 8px;border-radius:999px">Outfit</span>
-      <button id="outfit">Change</button>
+    <div>
+      <div style="margin-bottom:6px">Body type</div>
+      <select id="body" style="width:100%;padding:8px;border:0;border-radius:8px;background:#17212c;color:#e7ecf2">
+        <option value="slim" selected>Slim</option>
+        <option value="curvy">Curvy</option>
+        <option value="athletic">Athletic</option>
+      </select>
     </div>
-  </section>
-</main>
+    <div>
+      <div style="margin-bottom:6px">Hair style</div>
+      <select id="hairStyle" style="width:100%;padding:8px;border:0;border-radius:8px;background:#17212c;color:#e7ecf2">
+        <option value="curls" selected>Curls</option>
+        <option value="bun">Bun</option>
+        <option value="braids">Braids</option>
+        <option value="short">Short</option>
+      </select>
+    </div>
+    <div>
+      <div style="margin-bottom:6px">Hair color</div>
+      <select id="hairColor" style="width:100%;padding:8px;border:0;border-radius:8px;background:#17212c;color:#e7ecf2">
+        <option value="#0c0b0c" selected>Black</option>
+        <option value="#2b1d12">Dark brown</option>
+        <option value="#4a2c1a">Brown</option>
+        <option value="#2b2b2b">Gray</option>
+      </select>
+    </div>
+    <div style="grid-column:1 / span 2;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span class="badge">Outfit</span><button id="outfit">Change</button>
+      <span class="badge">Time speed</span><input id="time" type="range" min="0.5" max="6" step="0.5" value="2" style="width:180px"><span id="timeLbl" class="badge">2 min/sec</span>
+    </div>
+  </div>
+</section>
 
 <div id="toast" hidden></div>
+<canvas class="webgl" id="webgl"></canvas>
 
 <footer>
   <button id="load">Load</button>
@@ -120,214 +149,212 @@
   <button id="mute">🔊</button>
 </footer>
 
+<!-- Three.js (CDN) -->
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+
 <script>
 (()=>{
-// ---------- helpers ----------
-function $(id){return document.getElementById(id)}
-function $all(sel){return Array.from(document.querySelectorAll(sel))}
-function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
-function rid(){return Math.random().toString(36).slice(2)}
-function hour(t){return Math.floor((t/60)%24)}
-function timeFmt(mins){const h=Math.floor((mins/60)%24),m=Math.floor(mins%60),ampm=h>=12?'PM':'AM',hh=((h+11)%12+1);return hh+':'+String(m).padStart(2,'0')+' '+ampm}
+/* ===== helpers ===== */
+const $=id=>document.getElementById(id), $$=s=>Array.from(document.querySelectorAll(s));
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const rid=()=>Math.random().toString(36).slice(2);
+const hour=t=>Math.floor((t/60)%24);
+const timeFmt=m=>{const h=Math.floor((m/60)%24),mi=Math.floor(m%60),ap=h>=12?'PM':'AM',hh=((h+11)%12+1);return `${hh}:${String(mi).padStart(2,'0')} ${ap}`;}
 function toastMsg(msg,ms=1200){const t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toastMsg._h);toastMsg._h=setTimeout(()=>t.hidden=true,ms)}
+const OUTFITS=[{top:0xa86dff,bottom:0x22252d,shoes:0xe7ecf2,name:'Casual'},{top:0x2ec27e,bottom:0x1f2a22,shoes:0xe8ecf1,name:'Work'},{top:0x4fd1ff,bottom:0x14202a,shoes:0xc8f7ff,name:'Gym'},{top:0xff6b9a,bottom:0x2a2e39,shoes:0xf5d36b,name:'Night Out'}];
 
-// ---------- canvas ----------
-const cvs=$('game'), ctx=cvs.getContext('2d',{alpha:false});
-let W=0,H=0,DPR=Math.max(1,Math.min(2,window.devicePixelRatio||1));
-function resize(){W=window.innerWidth-20; H=Math.max(360, window.innerHeight-56-104-260);
-  cvs.width=Math.floor(W*DPR); cvs.height=Math.floor(H*DPR); cvs.style.width=W+'px'; cvs.style.height=H+'px';
-  ctx.setTransform(DPR,0,0,DPR,0,0);
-}
-addEventListener('resize',resize,{passive:true}); resize();
+/* ===== state ===== */
+const state={room:'living',t:7*60,speedMinPerSec:2,energy:70,hunger:30,fun:40,clean:60,edu:10,rep:10,money:120,sound:true,npcs:[],selectedNpc:null,lastNpcDay:-1,job:null,performance:{shifts:0,ontime:0}};
+const avatar={x:0,z:0,y:0.0,spd:2.2,walkT:0,skin:'#2c1f16',hair:'#0c0b0c',hairStyle:'curls',body:'slim',outfit:0};
+const JOBS={barista:{name:'Barista',open:[6,14],pay:16,reqEdu:0},stripper:{name:'Performer (Club)',open:[19,2],pay:28,reqEdu:0,audition:true},lawyer:{name:'Junior Lawyer',open:[9,19],pay:55,reqEdu:70},doctor:{name:'Resident Doctor',open:[7,19],pay:60,reqEdu:85}};
 
-// ---------- UI refs ----------
-const energyEl=$('energy'), hungerEl=$('hunger'), funEl=$('fun'), cleanEl=$('clean'), eduEl=$('edu'), repEl=$('rep');
-const moneyEl=$('money'), jobLabel=$('jobLabel'), clockEl=$('clock');
-const tabs=$('tabs'); const panels={actions:$('panel-actions'),jobs:$('panel-jobs'),relationships:$('panel-relationships'),me:$('panel-me')};
-tabs.addEventListener('click',e=>{const b=e.target.closest('button'); if(!b) return; $all('#tabs button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); Object.values(panels).forEach(p=>p.classList.remove('active')); panels[b.dataset.tab].classList.add('active');});
-
-// on-canvas controls (define ONCE)
-const joy=$('joy'), knob=$('knob'), actBtn=$('act');
-let joyActive=false, joyCenter=null, joyVec={x:0,y:0}, target=null;
-cvs.addEventListener('pointerdown',e=>{const r=cvs.getBoundingClientRect(); target={x:e.clientX-r.left,y:e.clientY-r.top}; startJoy();});
-cvs.addEventListener('pointerup',stopJoy);
-cvs.addEventListener('pointermove',e=>{
-  if(!joyActive) return;
-  const r=joy.getBoundingClientRect(); if(!joyCenter) joyCenter={x:r.left+r.width/2,y:r.top+r.height/2};
-  const dx=e.clientX-joyCenter.x, dy=e.clientY-joyCenter.y, len=Math.hypot(dx,dy)||1, max=46;
-  joyVec.x=dx/len; joyVec.y=dy/len; knob.style.left=(50+clamp(dx,-max,max))+'%'; knob.style.top=(50+clamp(dy,-max,max))+'%';
-});
-function startJoy(){joy.style.display='block'; joyActive=true; joyCenter=null;}
-function stopJoy(){joy.style.display='none'; joyActive=false; joyVec.x=joyVec.y=0; knob.style.left='50%'; knob.style.top='50%';}
-
-// ---------- game state ----------
-const state={
-  t:7*60, speedMinPerSec:2,
-  energy:70, hunger:30, fun:40, clean:60, edu:10, rep:10, money:120, sound:true,
-  job:null,
-  grid:{cols:12,rows:8},
-  items:[
-    {id:'bed',name:'Bed',x:2,y:3,w:2,h:3},
-    {id:'sofa',name:'Sofa',x:6,y:3,w:3,h:2},
-    {id:'tv',name:'TV',x:4,y:6,w:2,h:1},
-    {id:'plant',name:'Plant',x:10,y:2,w:1,h:1},
-    {id:'shower',name:'Shower',x:0,y:1,w:1,h:2, use:'shower'},
-    {id:'kitchen',name:'Kitchen',x:0,y:5,w:2,h:2, use:'eat'}
-  ],
-  npcs:[], selectedNpc:null, lastNpcDay:-1, performance:{shifts:0,ontime:0}
-};
-const JOBS={barista:{name:'Barista',open:[6,14],pay:16,reqEdu:0}, stripper:{name:'Performer (Club)',open:[19,2],pay:28,reqEdu:0,audition:true}, lawyer:{name:'Junior Lawyer',open:[9,19],pay:55,reqEdu:70}, doctor:{name:'Resident Doctor',open:[7,19],pay:60,reqEdu:85}};
-$('jobsList').innerHTML=['barista','stripper','lawyer','doctor'].map(k=>{const j=JOBS[k]; return `
-  <div class="card" data-job="${k}">
-    <div><div class="name">${j.name}</div><div class="meta">Pay $${j.pay}/hr • ${fmtHours(j.open)} • ${j.reqEdu?('Edu '+j.reqEdu+'+'): 'No req'}</div></div>
-    <button>${k==='stripper'?'Audition':'Apply'}</button>
-  </div>`;}).join('');
+/* ===== UI wire ===== */
+$('jobsList').innerHTML=Object.keys(JOBS).map(k=>{const j=JOBS[k];return `<div class="card" data-job="${k}"><div><div class="name">${j.name}</div><div class="meta">Pay $${j.pay}/hr • ${fmtHours(j.open)} • ${j.reqEdu?('Edu '+j.reqEdu+'+'): 'No req'}</div></div><button>${k==='stripper'?'Audition':'Apply'}</button></div>`}).join('');
 $('panel-jobs').addEventListener('click',e=>{
   const card=e.target.closest('.card'); if(!card) return;
   const key=card.dataset.job, j=JOBS[key];
   if(key==='stripper'){ const score=(state.fun+state.clean+state.rep)/3+Math.random()*20; if(score<45) return toastMsg('Audition didn’t stick. Try later.'); state.job=key; }
   else { if(state.edu<j.reqEdu) return toastMsg('Not qualified yet'); state.job=key; }
-  jobLabel.textContent=JOBS[state.job].name; toastMsg('Hired!');
+  $('jobLabel').textContent=JOBS[state.job].name; toastMsg('Hired!');
 });
-
-const OUTFITS=[{top:'#a86dff',bottom:'#22252d',shoes:'#e7ecf2'},{top:'#ff6b9a',bottom:'#2a2e39',shoes:'#f5d36b'},{top:'#4fd1ff',bottom:'#14202a',shoes:'#c8f7ff'},{top:'#7cffb2',bottom:'#1c2a1f',shoes:'#e8ecf1'}];
-const avatar={x:120,y:180,spd:120,skin:'#2c1f16',hair:'#0c0b0c',hairStyle:'curls',outfit:0,walkT:0};
-$('outfit').addEventListener('click',()=>{ avatar.outfit=(avatar.outfit+1)%OUTFITS.length; toastMsg('Outfit changed');});
-
-// relationships UI
-const npcList=$('npcList'), npcActions=$('npcActions'), npcName=$('npcName');
-$('panel-relationships').addEventListener('click',e=>{
-  const act=e.target.getAttribute('data-npc'); if(!act) return;
-  const n=state.selectedNpc; if(!n) return toastMsg('Pick someone first');
-  if(act==='chat'){ bump('fun',8); addRel(n,5,10); timePass(20); toastMsg(`Chatted with ${n.name}`); }
-  if(act==='compliment'){ const g=Math.random()<0.8?(6+randInt(6)):0; addRel(n,g,g); timePass(10); toastMsg(g?'They smiled':'Awkward…'); }
-  if(act==='gift'){ if(state.money<25) return toastMsg('Need $25'); state.money-=25; addRel(n,10,20); timePass(10); toastMsg('They loved it!'); }
-  if(act==='date'){ if(state.money<40) return toastMsg('Need $40'); state.money-=40; bump('fun',18); state.clean=clamp(state.clean-6,0,100); state.energy=clamp(state.energy-8,0,100); const b=12+randInt(10); addRel(n,b,b); timePass(120); if(n.rel>=70&&n.status!=='partner'){n.status='partner'; toastMsg(`${n.name} is now your partner ❤️`,1600);} else toastMsg('Great date!'); }
-  renderNpcList(); setBars();
-});
-
-// actions
-$('actions').addEventListener('click',e=>{
-  const k=e.target.getAttribute('data-act'); if(!k) return;
-  const map={eat:actEat, sleep:actSleep, shower:actShower, tv:actTV, study:actStudy, work:actWork, clean:actClean, save:save};
-  (map[k]||(()=>{}))(); setBars();
-});
-actBtn.addEventListener('click', ()=>{
-  const n=nearInteract(); if(!n) return;
-  if(n.isNpc){ openNpc(n); return; }
-  if(n.id==='bed') actSleep(); else if(n.id==='tv') actTV(); else if(n.use==='shower') actShower(); else if(n.use==='eat') actEat();
-});
-
-// time slider
-const timeSlider=$('time'), timeLbl=$('timeLbl');
-timeSlider.value=state.speedMinPerSec; timeLbl.textContent=state.speedMinPerSec+' min/sec';
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; $$('#tabs button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); $$('.panel').forEach(p=>p.classList.remove('active')); $('panel-'+b.dataset.tab).classList.add('active');});
+$('rooms').addEventListener('click',e=>{const r=e.target.getAttribute('data-room'); if(!r)return; switchRoom(r,true);});
+$('actions').addEventListener('click',e=>{const k=e.target.getAttribute('data-act'); if(!k)return; ({eat:actEat,sleep:actSleep,shower:actShower,tv:actTV,study:actStudy,work:actWork,clean:actClean,save:save}[k]||(()=>{}))(); setBars();});
+$('outfit').addEventListener('click',()=>{ avatar.outfit=(avatar.outfit+1)%OUTFITS.length; applyOutfit(); toastMsg('Outfit: '+OUTFITS[avatar.outfit].name); });
+$('skin').addEventListener('change',e=>{ avatar.skin=e.target.value; applySkin(); });
+$('body').addEventListener('change',e=>{ avatar.body=e.target.value; applyBody(); });
+$('hairStyle').addEventListener('change',e=>{ avatar.hairStyle=e.target.value; drawFaceTexture(); });
+$('hairColor').addEventListener('change',e=>{ avatar.hair=e.target.value; drawFaceTexture(); });
+const timeSlider=$('time'), timeLbl=$('timeLbl'); timeSlider.value=state.speedMinPerSec; timeLbl.textContent=state.speedMinPerSec+' min/sec';
 timeSlider.addEventListener('input',()=>{ state.speedMinPerSec=parseFloat(timeSlider.value); timeLbl.textContent=state.speedMinPerSec+' min/sec'; });
+$('load').addEventListener('click',load); $('reset').addEventListener('click',()=>{ localStorage.removeItem('cozy3d_mobile'); location.reload(); }); $('mute').addEventListener('click',e=>{ state.sound=!state.sound; e.target.textContent=state.sound?'🔊':'🔇';});
 
-// save/load/reset
-$('load').addEventListener('click',load);
-$('reset').addEventListener('click',()=>{ localStorage.removeItem('cozy_glow_v2'); location.reload(); });
-$('mute').addEventListener('click',e=>{ state.sound=!state.sound; e.target.textContent=state.sound?'🔊':'🔇';});
-function save(){ const data={v:6,...state,avatar}; localStorage.setItem('cozy_glow_v2',JSON.stringify(data)); toastMsg('Saved'); }
-function load(){ const raw=localStorage.getItem('cozy_glow_v2'); if(!raw) return toastMsg('No save'); try{ const d=JSON.parse(raw); Object.assign(state,d); Object.assign(avatar,d.avatar||avatar); renderNpcList(); setBars(); toastMsg('Loaded'); }catch{ toastMsg('Load failed'); }}
+/* ===== Three.js setup ===== */
+const canvas=$('webgl');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
+renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+function resize(){const w=window.innerWidth,h=window.innerHeight; renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix();}
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0a1016);
+const camera=new THREE.PerspectiveCamera(55,1,0.1,100);
+camera.position.set(0,6,10); camera.lookAt(0,0,0);
+const light=new THREE.HemisphereLight(0xffffff,0x223344,1.1); scene.add(light);
+const dir=new THREE.DirectionalLight(0xffffff,0.7); dir.position.set(5,10,5); dir.castShadow=true; scene.add(dir);
+window.addEventListener('resize',resize,{passive:true}); resize();
 
-// ---------- loop ----------
-let last=performance.now();
-requestAnimationFrame(function tick(now){
-  const dt=Math.min(50,now-last)/1000; last=now;
-  step(dt); draw();
-  requestAnimationFrame(tick);
-});
+/* ===== Floor + rooms ===== */
+const floorGeo=new THREE.PlaneGeometry(20,14);
+const floorMatLiving=new THREE.MeshStandardMaterial({color:0x202830,metalness:0.1,roughness:0.9});
+const floorMatKitchen=new THREE.MeshStandardMaterial({color:0x303820,metalness:0.2,roughness:0.8});
+const floorMatBath=new THREE.MeshStandardMaterial({color:0x283036,metalness:0.2,roughness:0.8});
+const floorMatBed=new THREE.MeshStandardMaterial({color:0x2e2530,metalness:0.2,roughness:0.85});
+const floors={
+  living:new THREE.Mesh(floorGeo,floorMatLiving),
+  kitchen:new THREE.Mesh(floorGeo,floorMatKitchen),
+  bathroom:new THREE.Mesh(floorGeo,floorMatBath),
+  bedroom:new THREE.Mesh(floorGeo,floorMatBed)
+};
+Object.values(floors).forEach(m=>{m.rotation.x=-Math.PI/2; m.receiveShadow=true;});
+scene.add(floors.living); // start
 
-// ---------- step ----------
-function step(dt){
-  state.t += state.speedMinPerSec*dt;
-  const s=state.speedMinPerSec/2;
-  state.hunger=clamp(state.hunger+0.25*s*dt,0,100);
-  state.energy=clamp(state.energy-0.18*s*dt,0,100);
-  state.clean =clamp(state.clean -0.10*s*dt,0,100);
-  state.fun   =clamp(state.fun   -0.08*s*dt,0,100);
+// simple furniture
+function box(w,h,d,c){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshStandardMaterial({color:c,roughness:.8,metalness:.1})); m.castShadow=true; m.receiveShadow=true; return m;}
+const furn = {
+  living:[ box(3,1,1,0x8a685a).position.set(0,0.5,-2), box(2,1.2,0.5,0x1d2129).position.set(-6,0.6,2) ],
+  kitchen:[ box(8,1,1,0x555555).position.set(0,0.5,-3) ],
+  bathroom:[ box(1.2,2,1.2,0x2a3a44).position.set(5,1,-1) ],
+  bedroom:[ box(4,1,2,0x7a89c2).position.set(0,0.5,-2) ]
+};
+const roomGroup=new THREE.Group(); scene.add(roomGroup);
+function populateRoom(name){
+  roomGroup.clear();
+  const clones=[];
+  if(name==='living'){ clones.push(makeBox(3,1,1,0x8a685a,0,0.5,-2), makeBox(2,1.2,0.5,0x1d2129,-6,0.6,2)); }
+  if(name==='kitchen'){ clones.push(makeBox(8,1,1,0x555555,0,0.5,-3)); }
+  if(name==='bathroom'){ clones.push(makeBox(1.2,2,1.2,0x2a3a44,5,1,-1)); }
+  if(name==='bedroom'){ clones.push(makeBox(4,1,2,0x7a89c2,0,0.5,-2)); }
+  clones.forEach(m=>roomGroup.add(m));
+}
+function makeBox(w,h,d,c,x,y,z){const m=box(w,h,d,c); m.position.set(x,y,z); return m}
 
-  const day=Math.floor(state.t/(24*60));
-  if(day!==state.lastNpcDay){ state.lastNpcDay=day; if(state.npcs.length<3) spawnNpc(); }
-
-  // move
-  let vx=0,vy=0;
-  if(joyActive){ vx=joyVec.x*avatar.spd; vy=joyVec.y*avatar.spd; target=null; }
-  if(target){ const dx=target.x-avatar.x, dy=target.y-avatar.y, L=Math.hypot(dx,dy); if(L>2){ vx=dx/L*avatar.spd; vy=dy/L*avatar.spd; } else target=null; }
-  avatar.x=clamp(avatar.x+vx*dt, 32, W-32);
-  avatar.y=clamp(avatar.y+vy*dt, 120, H-28);
-  avatar.walkT += Math.hypot(vx,vy)*dt/120;
-
-  const near=nearInteract();
-  actBtn.style.display = near ? 'block' : 'none';
-  if(near) actBtn.textContent = near.isNpc ? 'Talk' : tipFor(near);
-
-  setBars();
+/* ===== Doors (positions) ===== */
+const doors={living:[{x:-9,z:0,to:'kitchen'},{x:9,z:0,to:'bathroom'}],
+             kitchen:[{x:9,z:0,to:'living'},{x:-9,z:0,to:'bedroom'}],
+             bathroom:[{x:-9,z:0,to:'living'}],
+             bedroom:[{x:9,z:0,to:'kitchen'}]};
+const doorMeshes=new THREE.Group(); scene.add(doorMeshes);
+function drawDoors(name){
+  doorMeshes.clear();
+  (doors[name]||[]).forEach(d=>{
+    const m=box(0.8,2.2,0.2,0x1a2330); m.position.set(d.x,1.1,d.z); m.userData.to=d.to;
+    doorMeshes.add(m);
+  });
 }
 
-// ---------- draw ----------
-function draw(){
-  // background (walls+floor)
-  ctx.fillStyle='#101725'; ctx.fillRect(0,0,W,H);
-  const pad=16, gw=W-pad*2, gh=H-pad*2;
-  ctx.save(); ctx.translate(pad,pad);
-  const floorY=gh*0.67;
-  ctx.fillStyle='#0f151c'; ctx.fillRect(0,0,gw,gh);
-  ctx.fillStyle='#0a0f14'; ctx.fillRect(0,floorY-6,gw,6);
-  for(let y=floorY;y<gh;y+=16){ ctx.fillStyle=(Math.floor(y/16)%2===0)?'#1a2026':'#181e24'; ctx.fillRect(0,y,gw,16); }
+/* ===== Character (3D) ===== */
+const player=new THREE.Group(); scene.add(player);
+const matSkin=new THREE.MeshStandardMaterial({color:new THREE.Color(avatar.skin)});
+const matTop=()=>new THREE.MeshStandardMaterial({color:OUTFITS[avatar.outfit].top,roughness:.7,metalness:.1});
+const matBottom=()=>new THREE.MeshStandardMaterial({color:OUTFITS[avatar.outfit].bottom,roughness:.7,metalness:.1});
+const matShoes=()=>new THREE.MeshStandardMaterial({color:OUTFITS[avatar.outfit].shoes,roughness:.6,metalness:.1});
 
-  // simple furniture
-  drawBed(2,3,2,3); drawSofa(6,3,3,2); drawTV(4,6,2,1); drawPlant(10,2,1,1);
+// body
+const bodyGeo=new THREE.CapsuleGeometry(0.45,1.2,8,16);
+const legsGeo=new THREE.CapsuleGeometry(0.2,0.6,6,12);
+const armGeo=new THREE.CapsuleGeometry(0.17,0.5,6,12);
+const headGeo=new THREE.SphereGeometry(0.35,24,24);
+const faceCanvas=document.createElement('canvas'); faceCanvas.width=256; faceCanvas.height=256;
+const faceTex=new THREE.CanvasTexture(faceCanvas);
+const matHead=new THREE.MeshStandardMaterial({map:faceTex});
+const hairMat=()=>new THREE.MeshStandardMaterial({color:new THREE.Color(avatar.hair)});
 
-  // NPCs
-  moveNpcs(1/60);
-  for(const n of state.npcs){ drawMiniSim(n.x-pad, n.y-pad); }
+const torso=new THREE.Mesh(bodyGeo, matTop()); torso.position.y=1.6; torso.castShadow=true; player.add(torso);
+const legL=new THREE.Mesh(legsGeo, matBottom()); legL.position.set(-0.2,0.6,0); legL.castShadow=true; player.add(legL);
+const legR=new THREE.Mesh(legsGeo, matBottom()); legR.position.set(0.2,0.6,0); legR.castShadow=true; player.add(legR);
+const armL=new THREE.Mesh(armGeo, matTop()); armL.position.set(-0.6,1.8,0); armL.rotation.z= Math.PI/16; player.add(armL);
+const armR=new THREE.Mesh(armGeo, matTop()); armR.position.set(0.6,1.8,0); armR.rotation.z=-Math.PI/16; player.add(armR);
+const shoesL=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.18,0.6), matShoes()); shoesL.position.set(-0.2,0.1,0.1); player.add(shoesL);
+const shoesR=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.18,0.6), matShoes()); shoesR.position.set(0.2,0.1,0.1); player.add(shoesR);
+// head with face texture
+const head=new THREE.Mesh(headGeo,matHead); head.position.set(0,2.4,0); head.castShadow=true; player.add(head);
+// hair cap
+const hair=new THREE.Mesh(new THREE.SphereGeometry(0.37,24,24,0,Math.PI*2,0,Math.PI/1.8),hairMat()); hair.position.copy(head.position); hair.position.y+=0.02; player.add(hair);
 
-  // Player (animated legs)
-  drawSim(avatar.x-pad, avatar.y-pad, avatar);
+function drawFaceTexture(){
+  const ctx=faceCanvas.getContext('2d'); ctx.clearRect(0,0,256,256);
+  // skin
+  ctx.fillStyle=avatar.skin; ctx.fillRect(0,0,256,256);
+  // hair (front bangs by style)
+  ctx.fillStyle=avatar.hair;
+  if(avatar.hairStyle==='bun'){ ctx.beginPath(); ctx.arc(128,44,26,0,Math.PI*2); ctx.fill(); ctx.fillRect(64,58,128,22); }
+  else if(avatar.hairStyle==='curls'){ for(let i=0;i<20;i++){ const x=40+i*9, y=58+Math.sin(i)*2; ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.fill(); } }
+  else if(avatar.hairStyle==='braids'){ for(let i=0;i<8;i++){ ctx.fillRect(80+i*8,58,4,28);} }
+  else { ctx.fillRect(70,58,116,20); }
+  // eyes
+  ctx.fillStyle="#fff"; ctx.fillRect(88,108,28,10); ctx.fillRect(140,108,28,10);
+  ctx.fillStyle="#111"; ctx.fillRect(98,110,8,8); ctx.fillRect(150,110,8,8);
+  // nose
+  ctx.fillStyle="#00000033"; ctx.beginPath(); ctx.moveTo(128,128); ctx.lineTo(122,143); ctx.lineTo(134,143); ctx.closePath(); ctx.fill();
+  // mouth
+  ctx.fillStyle="#b66"; ctx.fillRect(114,160,28,6);
+  faceTex.needsUpdate=true;
+}
+drawFaceTexture();
 
-  ctx.restore();
+function applyOutfit(){ torso.material=matTop(); armL.material=armR.material=torso.material; legL.material=legR.material=matBottom(); shoesL.material=shoesR.material=matShoes(); }
+function applySkin(){ /* face uses texture already */ }
+function applyBody(){
+  const s = (avatar.body==='slim')?1:(avatar.body==='curvy'?1.12:1.08);
+  torso.scale.set(1.02*s,1*s,1.02*s);
+  legL.scale.set(1,1,1); legR.scale.set(1,1,1);
+}
+applyOutfit(); applyBody();
+
+/* ===== NPCs (simple wander) ===== */
+const npcGroup=new THREE.Group(); scene.add(npcGroup);
+function spawnNpc(){
+  const m=new THREE.Group();
+  const body=new THREE.Mesh(new THREE.CapsuleGeometry(0.4,1.0,8,16), new THREE.MeshStandardMaterial({color:0x4fd1ff,roughness:.8}));
+  body.position.y=1.4; m.add(body);
+  const head=new THREE.Mesh(new THREE.SphereGeometry(0.32,20,20), new THREE.MeshStandardMaterial({color:0xc99b75})); head.position.y=2.1; m.add(head);
+  m.position.set((Math.random()<.5?-1:1)*5,0,(Math.random()<.5?-1:1)*2);
+  m.userData={vx:(Math.random()<.5?-1:1)*0.6,name:rand(['Alex','Jordan','Taylor','Riley','Casey','Avery','Kai','Skye','Nina','Malik','Jada','Imani','Noah'])+' '+(Math.random()<0.5?'B.':'C.'),rel:10+randInt(15),status:'acquaintance'};
+  npcGroup.add(m);
+  state.npcs.push({id:rid(), name:m.userData.name, rel:m.userData.rel, status:'acquaintance', obj:m});
+}
+function moveNpcs(dt){ npcGroup.children.forEach(n=>{ n.position.x+=n.userData.vx*dt; if(n.position.x<-8||n.position.x>8) n.userData.vx*=-1; }); }
+
+/* ===== Tap to move ===== */
+let targetPos=null;
+canvas.addEventListener('pointerdown',e=>{
+  const x=e.clientX,y=e.clientY; const rect=canvas.getBoundingClientRect();
+  const mouse=new THREE.Vector2((x-rect.left)/rect.width*2-1, -((y-rect.top)/rect.height*2-1));
+  const ray=new THREE.Raycaster(); ray.setFromCamera(mouse,camera);
+  const intersects=ray.intersectObject(currentFloor(), true);
+  if(intersects.length){ targetPos=intersects[0].point.clone(); }
+  // door check
+  const hitDoors=ray.intersectObjects(doorMeshes.children,true);
+  if(hitDoors.length){ const to=hitDoors[0].object.userData.to; if(to) switchRoom(to,true); }
+},{passive:true});
+function currentFloor(){ return floors[state.room]; }
+
+/* ===== room switching ===== */
+function switchRoom(name,teleport){
+  if(!floors[name]) return;
+  scene.remove(floors[state.room]); scene.add(floors[name]);
+  state.room=name; populateRoom(name); drawDoors(name);
+  if(teleport){ player.position.set(0,0,2); camera.position.set(0,6,10); camera.lookAt(0,0,0); targetPos=null; }
 }
 
-// ---------- furniture drawing ----------
-function cellToRect(x,y,w,h){ const pad=16, gw=W-pad*2, gh=H-pad*2, cw=gw/state.grid.cols, ch=gh/state.grid.rows; return {x:pad+x*cw,y:pad+y*ch,w:w*cw-2,h:h*ch-2}; }
-function drawBed(x,y,w,h){ const r=cellToRect(x,y,w,h); ctx.fillStyle='#3d4660'; ctx.fillRect(r.x,r.y,r.w,r.h); ctx.fillStyle='#7a89c2'; ctx.fillRect(r.x+6,r.y+r.h*0.48,r.w-12,r.h*0.48); ctx.fillStyle='#dfe6f2'; ctx.fillRect(r.x+8,r.y+8,r.w*0.42,r.h*0.22); }
-function drawSofa(x,y,w,h){ const r=cellToRect(x,y,w,h); ctx.fillStyle='#8a685a'; ctx.fillRect(r.x,r.y+r.h*0.25,r.w,r.h*0.75); ctx.fillStyle='#9b7464'; ctx.fillRect(r.x,r.y,r.w,r.h*0.35); }
-function drawTV(x,y,w,h){ const r=cellToRect(x,y,w,h); ctx.fillStyle='#1d2129'; ctx.fillRect(r.x,r.y,r.w,r.h); ctx.fillStyle='#2a2f3a'; ctx.fillRect(r.x+4,r.y+3,r.w-8,r.h-6); }
-function drawPlant(x,y,w,h){ const r=cellToRect(x,y,w,h); ctx.fillStyle='#5c3b2a'; ctx.fillRect(r.x+2,r.y+r.h*0.45,r.w-4,r.h*0.55); ctx.fillStyle='#4caf6d'; ctx.beginPath(); ctx.ellipse(r.x+r.w*0.5,r.y+r.h*0.3,r.w*0.8,r.h*0.6,0,0,Math.PI*2); ctx.fill(); }
+/* ===== Needs/time/jobs ===== */
+function setBars(){ $('energy').style.width=state.energy+'%'; $('hunger').style.width=(100-state.hunger)+'%'; $('fun').style.width=state.fun+'%'; $('clean').style.width=state.clean+'%'; $('edu').style.width=state.edu+'%'; $('rep').style.width=state.rep+'%'; $('money').textContent=Math.floor(state.money); $('clock').textContent=timeFmt(state.t); $('jobLabel').textContent=state.job?JOBS[state.job].name:'Unemployed'; }
+function timePass(m){ state.t+=m }
+function rand(a){return a[Math.floor(Math.random()*a.length)]}
+function randInt(n){return Math.floor(Math.random()*(n+1))}
+function fmtHours([o,c]){ const f=h=>h===0?'12a':(h<12?`${h}a`:(h===12?'12p':`${h-12}p`)); return `${f(o)}–${f(c)}` }
 
-// ---------- sims ----------
-function drawMiniSim(x,y){ const o=OUTFITS[0]; const t=(performance.now()/200)%Math.PI, off=Math.sin(t)*2;
-  ctx.fillStyle=o.bottom; ctx.fillRect(x, y-18, 8, 18); ctx.fillRect(x+12, y-18+off, 8, 18-off);
-  ctx.fillStyle=o.shoes; ctx.fillRect(x-2, y-2, 10, 5); ctx.fillRect(x+12, y-2, 10, 5);
-  ctx.fillStyle=o.top; ctx.fillRect(x-2, y-38, 26, 22);
-  ctx.fillStyle='#c99b75'; ctx.beginPath(); ctx.arc(x+10, y-48, 7, 0, Math.PI*2); ctx.fill();
-}
-function drawSim(x,y,a){ const o=OUTFITS[a.outfit||0]; const swing=Math.sin(a.walkT*8); const L=20+Math.max(0,swing*6), R=20+Math.max(0,-swing*6);
-  ctx.fillStyle=o.bottom; ctx.fillRect(x, y-L, 10, L); ctx.fillRect(x+14, y-R, 10, R);
-  ctx.fillStyle=o.shoes; ctx.fillRect(x-2, y-2, 14, 6); ctx.fillRect(x+12, y-2, 14, 6);
-  ctx.fillStyle=o.top; ctx.fillRect(x-2, y-46, 28, 28);
-  ctx.fillStyle=avatar.skin; ctx.beginPath(); ctx.arc(x+12,y-58,9,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle=avatar.hair; ctx.fillRect(x, y-68, 24, 9);
-}
-
-// ---------- interactions ----------
-function nearInteract(){
-  const pad=16, gw=W-pad*2, gh=H-pad*2, cw=gw/state.grid.cols, ch=gh/state.grid.rows;
-  const px=avatar.x, py=avatar.y, pr=22;
-  for(const it of state.items){
-    const r={x:pad+it.x*cw, y:pad+it.y*ch, w:it.w*cw-2, h:it.h*ch-2};
-    const nx=clamp(px,r.x,r.x+r.w), ny=clamp(py,r.y,r.y+r.h);
-    if(Math.hypot(px-nx,py-ny)<pr) return it;
-  }
-  for(const n of state.npcs){ if(Math.hypot(px-n.x,py-n.y)<26) return n; }
-  return null;
-}
-function tipFor(it){ if(it.id==='bed') return 'Sleep'; if(it.id==='tv') return 'Watch TV'; if(it.use==='shower') return 'Shower'; if(it.use==='eat') return 'Eat'; return 'Interact'; }
-
-// actions impl
-function actEat(){ if(state.money<8) return toastMsg('Need $8'); state.money-=8; state.hunger=clamp(state.hunger-35,0,100); state.energy=clamp(state.energy+5,0,100); timePass(20); toastMsg('Ate a meal'); }
-function actSleep(){ let mins=0; while(state.energy<95&&mins<8*60){ state.energy=clamp(state.energy+1.2,0,100); state.hunger=clamp(state.hunger+0.4,0,100); mins+=10; } timePass(mins); toastMsg('You slept'); }
+function actEat(){ if(state.money<8)return toastMsg('Need $8'); state.money-=8; state.hunger=clamp(state.hunger-35,0,100); state.energy=clamp(state.energy+5,0,100); timePass(20); toastMsg('Ate a meal'); }
+function actSleep(){ let mins=0; while(state.energy<95&&mins<8*60){ state.energy=clamp(state.energy+1.2,0,100); state.hunger=clamp(state.hunger+0.4,0,100); mins+=10;} timePass(mins); toastMsg('You slept'); }
 function actShower(){ state.clean=clamp(state.clean+35,0,100); state.energy=clamp(state.energy+2,0,100); timePass(15); toastMsg('Shower done'); }
 function actTV(){ state.fun=clamp(state.fun+28,0,100); state.energy=clamp(state.energy-6,0,100); timePass(40); toastMsg('Watched TV'); }
 function actStudy(){ if(state.energy<20) return toastMsg('Too tired to study'); state.edu=clamp(state.edu+6+randInt(4),0,100); state.energy=clamp(state.energy-10,0,100); state.fun=clamp(state.fun-4,0,100); timePass(50); toastMsg('Studied'); }
@@ -345,23 +372,72 @@ function actWork(){
   timePass(mins);
 }
 function actClean(){ state.clean=clamp(state.clean+28,0,100); state.energy=clamp(state.energy-5,0,100); timePass(30); toastMsg('Tidied up'); }
+function save(){ const data={v:1,...state,avatar}; localStorage.setItem('cozy3d_mobile',JSON.stringify(data)); toastMsg('Saved'); }
+function load(){ const raw=localStorage.getItem('cozy3d_mobile'); if(!raw) return toastMsg('No save'); try{ const d=JSON.parse(raw); Object.assign(state,d); Object.assign(avatar,d.avatar||avatar); setBars(); toastMsg('Loaded'); switchRoom(state.room,true); }catch{ toastMsg('Load failed'); }}
 
-// NPCs
-function spawnNpc(){ const n={id:rid(),name:rand(['Alex','Jordan','Taylor','Riley','Casey','Avery','Kai','Skye','Nina','Malik','Jada','Imani','Noah'])+' '+(Math.random()<0.5?'B.':'C.'),rel:10+randInt(15),x:W-140,y:140,vx:(Math.random()<.5?-1:1)*24,isNpc:true,status:'acquaintance'}; state.npcs.push(n); renderNpcList(); }
-function moveNpcs(dt){ for(const n of state.npcs){ n.x+=n.vx*dt; if(n.x<80||n.x>W-80) n.vx*=-1; } }
-function renderNpcList(){ npcList.innerHTML = state.npcs.map(n=>`<div class="card" data-id="${n.id}"><div><div class="name">${n.name}</div><div class="meta">Status: ${n.status}</div></div><div class="meta">Rel ${n.rel}</div></div>`).join(''); $all('#npcList .card').forEach(el=>el.addEventListener('click',()=>{ const n=state.npcs.find(x=>x.id===el.dataset.id); state.selectedNpc=n; npcActions.style.display='flex'; npcName.textContent=`${n.name} • Rel ${n.rel}`; })); }
-function openNpc(n){ state.selectedNpc=n; npcActions.style.display='flex'; npcName.textContent=`${n.name} • Rel ${n.rel}`; }
+/* ===== Relationships panel ===== */
+const npcListEl=$('npcList'), npcActions=$('npcActions'), npcName=$('npcName');
+$('panel-relationships').addEventListener('click',e=>{
+  const act=e.target.getAttribute('data-npc'); if(!act) return;
+  const n=state.selectedNpc; if(!n) return toastMsg('Pick someone first');
+  if(act==='chat'){ bump('fun',8); addRel(n,5,10); timePass(20); toastMsg(`Chatted with ${n.name}`); }
+  if(act==='compliment'){ const g=Math.random()<0.8?(6+randInt(6)):0; addRel(n,g,g); timePass(10); toastMsg(g?'They smiled':'Awkward…'); }
+  if(act==='gift'){ if(state.money<25) return toastMsg('Need $25'); state.money-=25; addRel(n,10,20); timePass(10); toastMsg('They loved it!'); }
+  if(act==='date'){ if(state.money<40) return toastMsg('Need $40'); state.money-=40; bump('fun',18); state.clean=clamp(state.clean-6,0,100); state.energy=clamp(state.energy-8,0,100); const b=12+randInt(10); addRel(n,b,b); timePass(120); if(n.rel>=70&&n.status!=='partner'){n.status='partner'; toastMsg(`${n.name} is now your partner ❤️`,1600);} else toastMsg('Great date!'); }
+  renderNpcList(); setBars();
+});
+function renderNpcList(){
+  npcListEl.innerHTML = state.npcs.map(n=>`<div class="card" data-id="${n.id}"><div><div class="name">${n.name}</div><div class="meta">Status: ${n.status}</div></div><div class="meta">Rel ${n.rel}</div></div>`).join('');
+  $$('#npcList .card').forEach(el=>el.addEventListener('click',()=>{ const n=state.npcs.find(x=>x.id===el.dataset.id); state.selectedNpc=n; npcActions.style.display='flex'; npcName.textContent=`${n.name} • Rel ${n.rel}`; camera.lookAt(n.obj.position); }));
+}
 function addRel(n,min,max){ const add=min + randInt(Math.max(0,max-min)); n.rel=clamp(n.rel+add,0,100); if(n.rel>=70&&n.status!=='partner'){n.status='partner'; toastMsg(`${n.name} is now your partner ❤️`,1600);}}
 
-// HUD
-function setBars(){ energyEl.style.width=state.energy+'%'; hungerEl.style.width=(100-state.hunger)+'%'; funEl.style.width=state.fun+'%'; cleanEl.style.width=state.clean+'%'; eduEl.style.width=state.edu+'%'; repEl.style.width=state.rep+'%'; moneyEl.textContent=Math.floor(state.money); clockEl.textContent=timeFmt(state.t); jobLabel.textContent=state.job?JOBS[state.job].name:'Unemployed'; }
-function timePass(m){ state.t += m }
-function rand(a){return a[Math.floor(Math.random()*a.length)]}
-function randInt(n){return Math.floor(Math.random()*(n+1))}
-function fmtHours([o,c]){ const f=h=>h===0?'12a':(h<12?`${h}a`:(h===12?'12p':`${h-12}p`)); return `${f(o)}–${f(c)}` }
+/* ===== loop ===== */
+let last=performance.now();
+function animate(now){
+  const dt=Math.min(50,now-last)/1000; last=now;
+  // time/needs
+  state.t += state.speedMinPerSec*dt;
+  const s=state.speedMinPerSec/2;
+  state.hunger=clamp(state.hunger+0.25*s*dt,0,100);
+  state.energy=clamp(state.energy-0.18*s*dt,0,100);
+  state.clean =clamp(state.clean -0.10*s*dt,0,100);
+  state.fun   =clamp(state.fun   -0.08*s*dt,0,100);
 
-// init
-spawnNpc(); renderNpcList(); setBars();
+  // NPCs
+  const day=Math.floor(state.t/(24*60)); if(day!==state.lastNpcDay){ state.lastNpcDay=day; if(state.npcs.length<3){ spawnNpc(); renderNpcList(); } }
+  moveNpcs(60*dt);
+
+  // move player
+  if(targetPos){
+    const to=targetPos.clone().setY(0); const p=player.position.clone().setY(0);
+    const dir=to.clone().sub(p); const L=dir.length();
+    if(L>0.05){ dir.normalize(); player.position.add(dir.multiplyScalar(avatar.spd*dt)); player.lookAt(to.x,player.position.y,to.z); }
+    else targetPos=null;
+  }
+
+  // follow camera
+  const camTarget=new THREE.Vector3(player.position.x,1.2,player.position.z+4.5);
+  camera.position.lerp(new THREE.Vector3(player.position.x,5.8,player.position.z+7.5), 0.06);
+  camera.lookAt(camTarget);
+
+  setBars();
+  renderer.render(scene,camera);
+  requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
+
+/* ===== init ===== */
+function bump(k,amt){ state[k]=clamp(state[k]+amt,0,100) }
+function setRoomFloor(name){ Object.values(floors).forEach(m=>scene.remove(m)); scene.add(floors[name]); }
+function setup(){
+  switchRoom('living',true);
+  spawnNpc(); renderNpcList(); setBars();
+}
+setup();
+
+/* ===== misc ===== */
+function fmtHours([o,c]){ const f=h=>h===0?'12a':(h<12?`${h}a`:(h===12?'12p':`${h-12}p`)); return `${f(o)}–${f(c)}` }
 })();
 </script>
 </body>
