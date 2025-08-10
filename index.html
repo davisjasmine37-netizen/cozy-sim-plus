@@ -1,482 +1,148 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-<title>Cozy Life — Glow-Up</title>
-<meta name="theme-color" content="#0e141b" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cozy Life Glow-Up</title>
 <style>
-*{box-sizing:border-box}html,body{height:100%;margin:0}
-body{background:#0e141b;color:#e7ecf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-header,footer{position:fixed;left:0;right:0;background:#111826;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;z-index:5}
-header{top:0;box-shadow:0 2px 12px rgba(0,0,0,.35)}
-footer{bottom:0;gap:8px;justify-content:center;flex-wrap:wrap}
-#title{font-weight:700}
-.pill{display:inline-block;font-size:12px;margin-left:6px;background:#1a2330;border-radius:999px;padding:2px 8px;opacity:.9}
-.left,.right{display:flex;align-items:center;gap:14px}
-main{position:fixed;left:0;right:0;top:56px;bottom:104px;display:flex;flex-direction:column;gap:10px;padding:10px}
-
-/* Canvas container */
-#stage{position:relative;flex:1}
-#game{width:100%;height:100%;border-radius:16px;background:#0a1016;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px rgba(0,0,0,.45)}
-
-/* HUD */
-#hud{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.bar{display:flex;align-items:center;gap:10px}
-.bar label{width:84px;opacity:.85}
-.meter{flex:1;height:12px;background:#16202b;border-radius:999px;overflow:hidden}
-.meter span{display:block;height:100%;background:linear-gradient(90deg,#4fd1ff,#7cffb2)}
-
-/* Tabs & panels */
-#tabs{display:flex;gap:8px;flex-wrap:wrap}
-#tabs button{padding:12px 14px;border:0;border-radius:12px;background:#17212c;color:#e7ecf2;font-size:15px}
-#tabs button.active{outline:2px solid rgba(255,255,255,.15)}
-.panel{display:none}.panel.active{display:block}
-.grid-acts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.grid-acts button{padding:12px;border:0;border-radius:12px;background:#17212c;color:#e7ecf2;font-size:15px}
-.hint{opacity:.75;font-size:12px;margin-top:6px}
-
-/* Jobs / Relationships lists */
-.list{display:grid;grid-template-columns:1fr;gap:8px}
-.card{display:flex;justify-content:space-between;align-items:center;background:#0f151d;border-radius:12px;padding:10px 12px}
-.card .name{font-weight:700}.card .meta{opacity:.85;font-size:13px}
-.card button{padding:8px 12px;border:0;border-radius:10px;background:#1a2532;color:#e7ecf2}
-
-/* On-canvas controls */
-#joy{position:absolute;left:18px;bottom:130px;width:128px;height:128px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);touch-action:none;display:none;z-index:3}
-#knob{position:absolute;left:50%;top:50%;width:58px;height:58px;border-radius:999px;transform:translate(-50%,-50%);background:rgba(255,255,255,.28)}
-#act{position:absolute;right:18px;bottom:130px;padding:12px 16px;border:0;border-radius:12px;background:#1a2532;color:#e7ecf2;display:none;z-index:3}
-
-#toast{position:fixed;left:50%;top:22%;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:10px 14px;border-radius:10px;backdrop-filter:blur(8px);z-index:9}
-
-.badge{display:inline-block;background:#1a2330;padding:2px 8px;border-radius:999px;font-size:12px;margin-left:6px;opacity:.9}
-.slider{width:180px}
+  body { margin:0; font-family:sans-serif; background:#ccc; color:#fff; }
+  header { display:flex; justify-content:space-between; padding:8px; background:#222; }
+  canvas { display:block; background:#f2e1c1; margin:auto; }
+  .stats { display:grid; grid-template-columns:repeat(2, 1fr); gap:4px; padding:4px; background:#333; }
+  .bar { background:#555; height:10px; position:relative; }
+  .bar-fill { background:linear-gradient(to right, #0ff, #0f0); height:100%; }
+  #tabs { display:flex; background:#111; }
+  #tabs button { flex:1; padding:6px; background:#111; border:none; color:#fff; }
+  #tabs button.active { background:#333; }
+  .panel { display:none; padding:8px; background:#222; }
+  .panel.active { display:block; }
+  .grid-acts { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
+  button { padding:8px; border:none; border-radius:4px; background:#444; color:white; }
+  button:hover { background:#666; }
+  #joy { position:fixed; bottom:80px; left:20px; width:80px; height:80px; border-radius:50%; background:rgba(255,255,255,0.2); display:none; }
+  #knob { width:30px; height:30px; background:#fff; border-radius:50%; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); }
 </style>
 </head>
 <body>
+
 <header>
-  <div class="left">
-    <div id="title">Cozy Life <span class="pill">Glow-Up</span></div>
-    <div id="clock">7:00 AM</div>
-  </div>
-  <div class="right">
-    <div id="jobLabel">Unemployed</div>
-    <div id="money">$120</div>
-  </div>
+  <div>Cozy Life <span style="background:#555; padding:2px 4px; border-radius:4px;">Glow-Up</span></div>
+  <div><span id="clock">7:00 AM</span> <span id="jobLabel">Unemployed</span> $<span id="money">120</span></div>
 </header>
 
-<main>
-  <div id="stage">
-    <canvas id="game" aria-label="Apartment"></canvas>
-    <div id="joy"><div id="knob"></div></div>
-    <button id="act">Interact</button>
+<canvas id="game"></canvas>
+
+<div class="stats">
+  <label>Energy<div class="bar"><div id="energy" class="bar-fill" style="width:80%"></div></div></label>
+  <label>Hunger<div class="bar"><div id="hunger" class="bar-fill" style="width:80%"></div></div></label>
+  <label>Fun<div class="bar"><div id="fun" class="bar-fill" style="width:80%"></div></div></label>
+  <label>Clean<div class="bar"><div id="clean" class="bar-fill" style="width:80%"></div></div></label>
+  <label>Edu<div class="bar"><div id="edu" class="bar-fill" style="width:20%"></div></div></label>
+  <label>Rep<div class="bar"><div id="rep" class="bar-fill" style="width:10%"></div></div></label>
+</div>
+
+<section id="tabs">
+  <button data-tab="actions" class="active">Actions</button>
+  <button data-tab="jobs">Jobs</button>
+  <button data-tab="relationships">Relationships</button>
+  <button data-tab="me">Me</button>
+</section>
+
+<section id="panel-actions" class="panel active">
+  <div class="grid-acts" id="actions">
+    <button data-act="eat">Eat 🍜</button>
+    <button data-act="sleep">Sleep 🛏</button>
+    <button data-act="shower">Shower 🚿</button>
+    <button data-act="tv">Watch TV 📺</button>
+    <button data-act="study">Study 📚</button>
+    <button data-act="work">Work 💼</button>
+    <button data-act="clean">Clean 🧹</button>
+    <button data-act="save">Save 💾</button>
   </div>
+  <div class="hint">Move with joystick or tap the floor.</div>
+</section>
 
-  <section id="hud">
-    <div class="bar"><label>Energy</label><div class="meter"><span id="energy"></span></div></div>
-    <div class="bar"><label>Hunger</label><div class="meter"><span id="hunger"></span></div></div>
-    <div class="bar"><label>Fun</label><div class="meter"><span id="fun"></span></div></div>
-    <div class="bar"><label>Clean</label><div class="meter"><span id="clean"></span></div></div>
-    <div class="bar"><label>Edu</label><div class="meter"><span id="edu"></span></div></div>
-    <div class="bar"><label>Rep</label><div class="meter"><span id="rep"></span></div></div>
-  </section>
+<section id="panel-jobs" class="panel">
+  <div class="list" id="jobsList"></div>
+  <div class="hint">Get hired, then “Work” during day.</div>
+</section>
 
-  <section id="tabs">
-    <button data-tab="actions" class="active">Actions</button>
-    <button data-tab="jobs">Jobs</button>
-    <button data-tab="relationships">Relationships</button>
-    <button data-tab="me">Me</button>
-  </section>
-
-  <!-- Actions -->
-  <section id="panel-actions" class="panel active">
-    <div class="grid-acts" id="actions">
-      <button data-act="eat">Eat 🍲</button>
-      <button data-act="sleep">Sleep 🛏️</button>
-      <button data-act="shower">Shower 🚿</button>
-      <button data-act="tv">Watch TV 📺</button>
-      <button data-act="study">Study 📚</button>
-      <button data-act="work">Work 💼</button>
-      <button data-act="clean">Clean 🧹</button>
-      <button data-act="save">Save 💾</button>
+<section id="panel-relationships" class="panel">
+  <div class="list" id="npcList"></div>
+  <div class="card" id="npcActions" style="display:none;">
+    <div id="npcName"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="mini" data-npc="chat">Chat 💬</button>
+      <button class="mini" data-npc="compliment">Compliment 😊</button>
     </div>
-    <div class="hint">Move with **joystick** (bottom-left) or **tap** the floor. Press **Interact** near bed/TV/shower/kitchen or an NPC.</div>
-  </section>
+  </div>
+</section>
 
-  <!-- Jobs -->
-  <section id="panel-jobs" class="panel">
-    <div class="list" id="jobsList"></div>
-    <div class="hint">Get hired, then **Work** during open hours from the Actions tab.</div>
-  </section>
+<section id="panel-me" class="panel">
+  <div>Create character: <input placeholder="Name"></div>
+</section>
 
-  <!-- Relationships -->
-  <section id="panel-relationships" class="panel">
-    <div class="list" id="npcList"></div>
-    <div class="card" id="npcActions" style="display:none">
-      <div id="npcName">—</div>
-      <div style="display:flex;gap:8px">
-        <button class="mini" data-npc="chat">Chat 💬</button>
-        <button class="mini" data-npc="compliment">Compliment 🌟</button>
-        <button class="mini" data-npc="gift">Gift 🎁 ($25)</button>
-        <button class="mini" data-npc="date">Ask Out ❤️ ($40)</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Me -->
-  <section id="panel-me" class="panel">
-    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-      <span class="badge">Time speed</span>
-      <input id="time" class="slider" type="range" min="0.5" max="6" step="0.5" value="2" />
-      <span id="timeLbl" class="badge">2 min/sec</span>
-      <span class="badge">Outfit</span>
-      <button id="outfit">Change</button>
-    </div>
-  </section>
-</main>
-
-<div id="toast" hidden></div>
-
-<footer>
-  <button id="load">Load</button>
-  <button id="reset">Reset</button>
-  <button id="mute">🔊</button>
-</footer>
+<div id="joy"><div id="knob"></div></div>
 
 <script>
-(()=>{
-/* ========= Canvas & Layout ========= */
-const cvs=document.getElementById('game'), ctx=cvs.getContext('2d',{alpha:false});
+const cvs=document.getElementById('game'),ctx=cvs.getContext('2d',{alpha:false});
 let W=0,H=0,DPR=Math.max(1,Math.min(2,window.devicePixelRatio||1));
-function resize(){W=window.innerWidth-20; H=Math.max(360, window.innerHeight-56-104-260);
-  cvs.width=Math.floor(W*DPR); cvs.height=Math.floor(H*DPR); cvs.style.width=W+'px'; cvs.style.height=H+'px';
+function resize(){
+  W=window.innerWidth-20;H=Math.max(360,window.innerHeight-400);
+  cvs.width=Math.floor(W*DPR);cvs.height=Math.floor(H*DPR);
+  cvs.style.width=W+'px';cvs.style.height=H+'px';
   ctx.setTransform(DPR,0,0,DPR,0,0);
 }
-addEventListener('resize', resize, {passive:true}); resize();
+addEventListener('resize',resize,{passive:true});resize();
 
-/* ========= UI Elements ========= */
 const energyEl=byId('energy'), hungerEl=byId('hunger'), funEl=byId('fun'), cleanEl=byId('clean'), eduEl=byId('edu'), repEl=byId('rep');
-const moneyEl=byId('money'), jobLabel=byId('jobLabel'), clockEl=byId('clock'), toast=byId('toast');
+const moneyEl=byId('money'), jobLabel=byId('jobLabel'), clockEl=byId('clock');
 const tabs=byId('tabs');
 const panels={actions:byId('panel-actions'),jobs:byId('panel-jobs'),relationships:byId('panel-relationships'),me:byId('panel-me')};
-tabs.addEventListener('click',e=>{const b=e.target.closest('button'); if(!b) return; qsa('#tabs button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); Object.values(panels).forEach(p=>p.classList.remove('active')); panels[b.dataset.tab].classList.add('active');});
+tabs.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  qsa('#tabs button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  Object.values(panels).forEach(p=>p.classList.remove('active'));
+  panels[b.dataset.tab].classList.add('active');
+});
 
-/* ========= On-canvas controls ========= */
-const joy=byId('joy'), knob=byId('knob'), actBtn=byId('act');
-let joyActive=false, joyCenter=null, joyVec={x:0,y:0};
-cvs.addEventListener('pointerdown',e=>{ // tap-to-move
-  const r=cvs.getBoundingClientRect(); const x=e.clientX-r.left, y=e.clientY-r.top; target={x,y};
-  startJoy();
+const joy=byId('joy'),knob=byId('knob');
+let joyActive=false,joyCenter=null,joyVec={x:0,y:0};
+cvs.addEventListener('pointerdown',e=>{
+  const r=cvs.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
+  target={x,y};startJoy();
 });
 cvs.addEventListener('pointerup',stopJoy);
 cvs.addEventListener('pointermove',e=>{
-  if(!joyActive) return;
+  if(!joyActive)return;
   const r=joy.getBoundingClientRect();
-  if(!joyCenter) joyCenter={x:r.left+r.width/2,y:r.top+r.height/2};
-  const dx=e.clientX-joyCenter.x, dy=e.clientY-joyCenter.y;
-  const len=Math.hypot(dx,dy)||1, max=46; const nx=dx/len, ny=dy/len;
-  joyVec.x=nx; joyVec.y=ny;
+  if(!joyCenter)joyCenter={x:r.left+r.width/2,y:r.top+r.height/2};
+  const dx=e.clientX-joyCenter.x,dy=e.clientY-joyCenter.y;
+  const len=Math.hypot(dx,dy)||1,max=46;const nx=dx/len,ny=dy/len;
+  joyVec.x=nx;joyVec.y=ny;
   knob.style.left=(50+clamp(dx,-max,max))+'%';
   knob.style.top=(50+clamp(dy,-max,max))+'%';
 });
-function startJoy(){joy.style.display='block'; joyActive=true; joyCenter=null;}
-function stopJoy(){joy.style.display='none'; joyActive=false; joyVec.x=joyVec.y=0; knob.style.left='50%'; knob.style.top='50%';}
+function startJoy(){joy.style.display='block';joyActive=true;joyCenter=null;}
+function stopJoy(){joy.style.display='none';joyActive=false;joyVec.x=joyVec.y=0;knob.style.left='50%';knob.style.top='50%';}
 
-/* ========= State ========= */
-const state={
-  t:7*60, speedMinPerSec:2,
-  energy:70, hunger:30, fun:40, clean:60, edu:10, rep:10, money:120, sound:true,
-  job:null,
-  // world grid
-  grid:{cols:12,rows:8},
-  // room items w/ interaction collider tags
-  items:[
-    {id:'bed',name:'Bed',x:2,y:3,w:2,h:3},
-    {id:'sofa',name:'Sofa',x:6,y:3,w:3,h:2},
-    {id:'tv',name:'TV',x:4,y:6,w:2,h:1},
-    {id:'plant',name:'Plant',x:10,y:2,w:1,h:1},
-    {id:'shower',name:'Shower',x:0,y:1,w:1,h:2, use:'shower'},
-    {id:'kitchen',name:'Kitchen',x:0,y:5,w:2,h:2, use:'eat'}
-  ],
-  npcs:[], selectedNpc:null, lastNpcDay:-1, performance:{shifts:0,ontime:0}
-};
-const JOBS={barista:{name:'Barista',open:[6,14],pay:16,reqEdu:0}, stripper:{name:'Performer (Club)',open:[19,2],pay:28,reqEdu:0,audition:true}, lawyer:{name:'Junior Lawyer',open:[9,19],pay:55,reqEdu:70}, doctor:{name:'Resident Doctor',open:[7,19],pay:60,reqEdu:85}};
-const jobsList=byId('jobsList'); jobsList.innerHTML=['barista','stripper','lawyer','doctor'].map(k=>{
-  const j=JOBS[k]; return `<div class="card" data-job="${k}"><div><div class="name">${j.name}</div><div class="meta">Pay $${j.pay}/hr • ${fmtHours(j.open)} • ${j.reqEdu?('Edu '+j.reqEdu+'+'): 'No req'}</div></div><button>${k==='stripper'?'Audition':'Apply'}</button></div>`;
-}).join('');
-byId('panel-jobs').addEventListener('click',e=>{
-  const c=e.target.closest('.card'); if(!c) return;
-  const key=c.dataset.job, j=JOBS[key];
-  if(key==='stripper'){ const score=(state.fun+state.clean+state.rep)/3+Math.random()*20; if(score<45) return toastMsg('Audition didn’t stick. Try later.'); state.job=key; }
-  else { if(state.edu<j.reqEdu) return toastMsg('Not qualified yet'); state.job=key; }
-  jobLabel.textContent=JOBS[state.job].name; toastMsg('Hired!');
-});
-
-/* ========= Avatar (animated) ========= */
-const OUTFITS=[{top:'#a86dff',bottom:'#22252d',shoes:'#e7ecf2'},{top:'#ff6b9a',bottom:'#2a2e39',shoes:'#f5d36b'},{top:'#4fd1ff',bottom:'#14202a',shoes:'#c8f7ff'},{top:'#7cffb2',bottom:'#1c2a1f',shoes:'#e8ecf1'}];
-const avatar={x:W/2,y:H*0.76,spd:110,skin:'#2c1f16',hair:'#0c0b0c',hairStyle:'curls',outfit:0,walkT:0};
-byId('outfit').addEventListener('click',()=>{ avatar.outfit=(avatar.outfit+1)%OUTFITS.length; toastMsg('Outfit changed');});
-
-/* ========= Relationships / NPC UI ========= */
-const npcList=byId('npcList'), npcActions=byId('npcActions'), npcName=byId('npcName');
-byId('panel-relationships').addEventListener('click',e=>{
-  const act=e.target.getAttribute('data-npc'); if(!act) return;
-  const n=state.selectedNpc; if(!n) return toastMsg('Pick someone first');
-  if(act==='chat'){ bump('fun',8); addRel(n,5,10); timePass(20); toastMsg(`Chatted with ${n.name}`); blip(760,.05); }
-  if(act==='compliment'){ const g=Math.random()<0.8?(6+randInt(6)):0; addRel(n,g,g); timePass(10); toastMsg(g?'They smiled':'Awkward…'); }
-  if(act==='gift'){ if(state.money<25) return toastMsg('Need $25'); state.money-=25; addRel(n,10,20); timePass(10); toastMsg('They loved it!'); }
-  if(act==='date'){ if(state.money<40) return toastMsg('Need $40'); state.money-=40; bump('fun',18); state.clean=clamp(state.clean-6,0,100); state.energy=clamp(state.energy-8,0,100); const b=12+randInt(10); addRel(n,b,b); timePass(120); if(n.rel>=70&&n.status!=='partner'){n.status='partner'; toastMsg(`${n.name} is now your partner ❤️`,1600);} else toastMsg('Great date!'); }
-  renderNpcList(); setBars();
-});
-
-/* ========= Actions ========= */
-const actionsEl=byId('actions');
-actionsEl.addEventListener('click',e=>{
-  const k=e.target.getAttribute('data-act'); if(!k) return;
-  const map={eat:actEat, sleep:actSleep, shower:actShower, tv:actTV, study:actStudy, work:actWork, clean:actClean, save:save};
-  (map[k]||(()=>{}))(); setBars();
-});
-const actBtn=byId('act');
-actBtn.addEventListener('click', ()=>{
-  const target = nearInteract();
-  if(!target) return;
-  if(target.isNpc){ openNpc(target); return; }
-  if(target.id==='bed') actSleep();
-  else if(target.id==='tv') actTV();
-  else if(target.use==='shower') actShower();
-  else if(target.use==='eat') actEat();
-});
-
-/* ========= Time & needs ========= */
-const timeSlider=byId('time'), timeLbl=byId('timeLbl');
-timeSlider.value=state.speedMinPerSec; timeLbl.textContent=state.speedMinPerSec+' min/sec';
-timeSlider.addEventListener('input',()=>{ state.speedMinPerSec=parseFloat(timeSlider.value); timeLbl.textContent=state.speedMinPerSec+' min/sec'; });
-
-/* ========= Save / Load ========= */
-byId('load').addEventListener('click',load);
-byId('reset').addEventListener('click',()=>{ localStorage.removeItem('cozy_glow'); location.reload(); });
-byId('mute').addEventListener('click',e=>{ state.sound=!state.sound; e.target.textContent=state.sound?'🔊':'🔇';});
-
-function save(){ const data={v:5,...state,avatar}; localStorage.setItem('cozy_glow',JSON.stringify(data)); toastMsg('Saved'); }
-function load(){ const raw=localStorage.getItem('cozy_glow'); if(!raw) return toastMsg('No save'); try{ const d=JSON.parse(raw); Object.assign(state,d); Object.assign(avatar,d.avatar||avatar); renderNpcList(); setBars(); toastMsg('Loaded'); }catch{ toastMsg('Load failed'); }}
-
-/* ========= Core loop ========= */
-let last=performance.now(), target=null;
-function tick(now){
-  const dt=Math.min(50,now-last)/1000; last=now;
-  step(dt);
-  draw();
-  requestAnimationFrame(tick);
-}
-requestAnimationFrame(tick);
-
-function step(dt){
-  // clock + needs
-  state.t += state.speedMinPerSec*dt;
-  const s=state.speedMinPerSec/2;
-  state.hunger=clamp(state.hunger+0.25*s*dt,0,100);
-  state.energy=clamp(state.energy-0.18*s*dt,0,100);
-  state.clean =clamp(state.clean -0.10*s*dt,0,100);
-  state.fun   =clamp(state.fun   -0.08*s*dt,0,100);
-
-  // daily NPC spawn
-  const day=Math.floor(state.t/(24*60));
-  if(day!==state.lastNpcDay){ state.lastNpcDay=day; if(state.npcs.length<4) spawnNpc(); }
-
-  // movement
-  let vx=0,vy=0, speed=avatar.spd;
-  if(joyActive){ vx=joyVec.x*speed; vy=joyVec.y*speed; target=null; }
-  if(target){ const dx=target.x-avatar.x, dy=target.y-avatar.y, L=Math.hypot(dx,dy); if(L>2){ vx=dx/L*speed; vy=dy/L*speed; } else target=null; }
-  avatar.x=clamp(avatar.x+vx*dt, 32, W-32);
-  avatar.y=clamp(avatar.y+vy*dt, 120, H-28);
-  avatar.walkT += Math.hypot(vx,vy)*dt/120;
-
-  // Interact prompt
-  const near = nearInteract();
-  if(near){ actBtn.style.display='block'; actBtn.textContent = near.isNpc ? 'Talk' : tipFor(near); }
-  else actBtn.style.display='none';
-
-  setBars();
-}
-
-/* ========= World geometry helpers ========= */
-function geom(){ const pad=16, gw=W-pad*2, gh=H-pad*2; return {pad, gw, gh, cw:gw/state.grid.cols, ch:gh/state.grid.rows}; }
-function rectFor(it,g){ const {pad,cw,ch}=g; return {x:pad+it.x*cw, y:pad+it.y*ch, w:it.w*cw-2, h:it.h*ch-2}; }
-
-/* ========= Interactions ========= */
-function nearInteract(){
-  const g=geom(); const px=avatar.x, py=avatar.y, pr=22;
-  // furniture
-  for(const it of state.items){
-    const r=rectFor(it,g); const nx=clamp(px,r.x, r.x+r.w), ny=clamp(py,r.y, r.y+r.h);
-    if(Math.hypot(px-nx,py-ny)<pr) return it;
-  }
-  // NPCs
-  for(const n of state.npcs){ if(Math.hypot(px-n.x,py-n.y)<26) return n; }
-  return null;
-}
-function tipFor(it){
-  if(it.id==='bed') return 'Sleep';
-  if(it.id==='tv') return 'Watch TV';
-  if(it.use==='shower') return 'Shower';
-  if(it.use==='eat') return 'Eat';
-  return 'Interact';
-}
-
-/* ========= Actions (effects + time) ========= */
-function actEat(){ if(state.money<8) return toastMsg('Need $8'); state.money-=8; state.hunger=clamp(state.hunger-35,0,100); state.energy=clamp(state.energy+5,0,100); timePass(20); toastMsg('Ate a meal'); blip(520,.05); }
-function actSleep(){ let mins=0; while(state.energy<95&&mins<8*60){ state.energy=clamp(state.energy+1.2,0,100); state.hunger=clamp(state.hunger+0.4,0,100); mins+=10; } timePass(mins); toastMsg('You slept'); }
-function actShower(){ state.clean=clamp(state.clean+35,0,100); state.energy=clamp(state.energy+2,0,100); timePass(15); toastMsg('Shower done'); }
-function actTV(){ state.fun=clamp(state.fun+28,0,100); state.energy=clamp(state.energy-6,0,100); timePass(40); toastMsg('Watched TV'); }
-function actStudy(){ if(state.energy<20) return toastMsg('Too tired to study'); state.edu=clamp(state.edu+6+randInt(4),0,100); state.energy=clamp(state.energy-10,0,100); state.fun=clamp(state.fun-4,0,100); timePass(50); toastMsg('Studied'); }
-function actWork(){
-  if(!state.job) return toastMsg('No job yet');
-  const j=JOBS[state.job], h=hour(), open=j.open[0], close=j.open[1];
-  const isOpen = open<close ? (h>=open && h<close) : (h>=open || h<close);
-  if(!isOpen) return toastMsg('Your job is closed now');
-  const hours=2+randInt(2), mins=hours*60; let pay=j.pay*hours; if(state.job==='stripper') pay += randInt(80);
-  const perf=(state.energy>40?1:0.7)*(state.clean>40?1:0.8);
-  state.money+=Math.floor(pay*perf);
-  state.energy=clamp(state.energy-12*hours/2,0,100); state.hunger=clamp(state.hunger+10*hours/2,0,100); state.fun=clamp(state.fun+(state.job==='stripper'?4:-4),0,100); state.clean=clamp(state.clean-6*hours/2,0,100);
-  state.performance.shifts++; if(perf>=1) state.performance.ontime++;
-  if(state.performance.ontime>0 && state.performance.ontime%6===0) { j.pay+=2; toastMsg('Raise!'); }
-  else toastMsg(`Worked ${hours}h, earned $${Math.floor(pay*perf)}`);
-  timePass(mins);
-}
-function actClean(){ state.clean=clamp(state.clean+28,0,100); state.energy=clamp(state.energy-5,0,100); timePass(30); toastMsg('Tidied up'); }
-
-/* ========= NPCs ========= */
-function spawnNpc(){
-  const n={id:rid(), name:rand(['Alex','Jordan','Taylor','Riley','Casey','Avery','Kai','Skye','Nina','Malik','Jada','Imani','Noah'])+' '+(Math.random()<0.5?'B.':'C.'), rel:10+randInt(15), x:W-140, y:140, vx:(Math.random()<.5?-1:1)*24, isNpc:true, status:'acquaintance'};
-  state.npcs.push(n); renderNpcList();
-}
-function moveNpcs(dt){ for(const n of state.npcs){ n.x+=n.vx*dt; if(n.x<80||n.x>W-80) n.vx*=-1; } }
-function renderNpcList(){
-  npcList.innerHTML = state.npcs.map(n=>`<div class="card" data-id="${n.id}"><div><div class="name">${n.name}</div><div class="meta">Status: ${n.status}</div></div><div class="meta">Rel ${n.rel}</div></div>`).join('');
-  npcList.querySelectorAll('.card').forEach(el=>el.addEventListener('click',()=>{ const n=state.npcs.find(x=>x.id===el.dataset.id); state.selectedNpc=n; npcActions.style.display='flex'; npcName.textContent=`${n.name} • Rel ${n.rel}`; }));
-}
-function openNpc(n){ state.selectedNpc=n; npcActions.style.display='flex'; npcName.textContent=`${n.name} • Rel ${n.rel}`; }
-function addRel(n,min,max){ const add=min + randInt(Math.max(0,max-min)); n.rel=clamp(n.rel+add,0,100); if(n.rel>=70&&n.status!=='partner'){n.status='partner'; toastMsg(`${n.name} is now your partner ❤️`,1600);}}
-
-/* ========= Rendering (realistic apartment) ========= */
+let player={x:100,y:100,size:20};
+let target=null;
 function draw(){
-  const hr=hour();
-  // vignette background
-  const g1=ctx.createLinearGradient(0,0,0,H*0.6); g1.addColorStop(0,'#101725'); g1.addColorStop(1,'#0a1118'); ctx.fillStyle=g1; ctx.fillRect(0,0,W,H);
-
-  const {pad,gw,gh,cw,ch}=geom();
-  ctx.save(); ctx.translate(pad,pad);
-
-  // back wall & floor (wood)
-  const floorY=gh*0.67;
-  ctx.fillStyle='#0f151c'; ctx.fillRect(0,0,gw,gh);
-  // soft light from window
-  if(hr>6 && hr<18){ ctx.fillStyle='rgba(160,200,255,0.06)'; ctx.beginPath(); ctx.moveTo(gw-160,40); ctx.lineTo(gw,0); ctx.lineTo(gw,gh); ctx.lineTo(gw-240,gh); ctx.closePath(); ctx.fill(); }
-
-  // baseboard + floorboards
-  ctx.fillStyle='#0a0f14'; ctx.fillRect(0,floorY-6,gw,6);
-  const plankH=16;
-  for(let y=floorY;y<gh;y+=plankH){ ctx.fillStyle=(Math.floor(y/plankH)%2===0)?'#1a2026':'#181e24'; ctx.fillRect(0,y,gw,plankH); ctx.strokeStyle='rgba(0,0,0,.15)'; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(gw,y); ctx.stroke(); }
-
-  // window frame
-  ctx.fillStyle='#0b0f14'; ctx.fillRect(gw-160,28,120,80);
-  ctx.fillStyle=(hr>=19||hr<=6)?'#0a1420':'#a3d7ff'; ctx.fillRect(gw-152,36,104,64);
-  ctx.fillStyle='rgba(255,255,255,.8)'; ctx.fillRect(gw-104,36,2,64); ctx.fillRect(gw-152,66,104,2);
-
-  // rug
-  ctx.fillStyle='#222a3c'; roundRect(ctx,gw*0.35,floorY+14,180,96,16); ctx.fill();
-
-  // shadows helper
-  function shadow(x,y,w,h,a=.25){ ctx.fillStyle=`rgba(0,0,0,${a})`; ctx.filter='blur(6px)'; ctx.fillRect(x+6,y+h-4,w,8); ctx.filter='none'; }
-
-  // furniture
-  for(const it of state.items){
-    const x=it.x*cw, y=it.y*ch, w=it.w*cw-2, h=it.h*ch-2; shadow(x,y,w,h,0.28);
-    if(it.id==='bed'){ ctx.fillStyle='#3d4660'; ctx.fillRect(x,y,w,h); ctx.fillStyle='#7a89c2'; ctx.fillRect(x+6,y+h*0.48,w-12,h*0.48); ctx.fillStyle='#dfe6f2'; ctx.fillRect(x+8,y+8,w*0.42,h*0.22); }
-    else if(it.id==='sofa'){ ctx.fillStyle='#8a685a'; ctx.fillRect(x,y+h*0.25,w,h*0.75); ctx.fillStyle='#9b7464'; ctx.fillRect(x,y,w,h*0.35); ctx.fillStyle='#b58a7a'; ctx.fillRect(x+w*0.1,y+h*0.35,w*0.35,h*0.35); ctx.fillRect(x+w*0.55,y+h*0.35,w*0.35,h*0.35); }
-    else if(it.id==='tv'){ ctx.fillStyle='#1d2129'; ctx.fillRect(x,y,w,h); ctx.fillStyle='#2a2f3a'; ctx.fillRect(x+4,y+3,w-8,h-6); ctx.fillStyle='#2c313c'; ctx.fillRect(x+w*0.4,y+h-4,w*0.2,4); }
-    else if(it.id==='plant'){ ctx.fillStyle='#5c3b2a'; ctx.fillRect(x+2,y+h*0.45,w-4,h*0.55); ctx.fillStyle='#4caf6d'; ctx.beginPath(); ctx.ellipse(x+w*0.5,y+h*0.3,w*0.8,h*0.6,0,0,Math.PI*2); ctx.fill(); }
-    else if(it.id==='shower'){ ctx.fillStyle='#2a3a44'; ctx.fillRect(x,y,w,h); }
-    else if(it.id==='kitchen'){ ctx.fillStyle='#3a3a3a'; ctx.fillRect(x,y,w,h); }
-  }
-
-  // NPCs move + draw
-  moveNpcs(1/60);
-  for(const n of state.npcs){ drawMiniSim(n.x-pad, n.y-pad, '#c99b75', '#2b2b2b', 'short'); }
-
-  // Player sim (animated walk)
-  drawSim(avatar.x-pad, avatar.y-pad, avatar);
-
-  ctx.restore();
+  ctx.fillStyle='#f2e1c1';ctx.fillRect(0,0,W,H); // room background
+  ctx.fillStyle='saddlebrown';ctx.fillRect(0,0,W,20); // wall
+  ctx.fillStyle='black';ctx.beginPath();ctx.arc(player.x,player.y,player.size,0,Math.PI*2);ctx.fill();
+  if(target){const dx=target.x-player.x,dy=target.y-player.y;const dist=Math.hypot(dx,dy);
+    if(dist>1){player.x+=dx/dist;player.y+=dy/dist;}}
+  requestAnimationFrame(draw);
 }
+draw();
 
-/* ========= Drawing helpers ========= */
-function drawMiniSim(x,y,skin,hair,style){
-  const o=OUTFITS[0];
-  // legs (little walk wiggle)
-  const t = (performance.now()/200)%Math.PI;
-  const off = Math.sin(t)*2;
-  ctx.fillStyle=o.bottom; ctx.fillRect(x, y-18, 8, 18); ctx.fillRect(x+12, y-18+off, 8, 18-off);
-  ctx.fillStyle=o.shoes;  ctx.fillRect(x-2, y-2, 10, 5); ctx.fillRect(x+12, y-2, 10, 5);
-  ctx.fillStyle=o.top;    ctx.fillRect(x-2, y-38, 26, 22);
-  ctx.fillStyle=skin;     ctx.beginPath(); ctx.arc(x+10, y-48, 7, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle=hair;     ctx.fillRect(x-1, y-54, 22, 7);
-}
-
-function drawSim(x,y,a){
-  const o=OUTFITS[a.outfit||0];
-  // legs animation
-  const swing = Math.sin(a.walkT*8);
-  const L = 20 + Math.max(0, swing*6);
-  const R = 20 + Math.max(0, -swing*6);
-  ctx.fillStyle=o.bottom; ctx.fillRect(x, y-L, 10, L); ctx.fillRect(x+14, y-R, 10, R);
-  ctx.fillStyle=o.shoes;  ctx.fillRect(x-2, y-2, 14, 6); ctx.fillRect(x+12, y-2, 14, 6);
-  ctx.fillStyle=o.top;    ctx.fillRect(x-2, y-46, 28, 28);
-  ctx.fillStyle=a.skin;   ctx.beginPath(); ctx.arc(x+12, y-58, 9, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle=a.hair;
-  if(a.hairStyle==='bun'){ ctx.beginPath(); ctx.arc(x+12, y-68, 6, 0, Math.PI*2); ctx.fill(); ctx.fillRect(x, y-66, 24, 9); }
-  else if(a.hairStyle==='curls'){ for(let i=0;i<7;i++){ ctx.beginPath(); ctx.arc(x+i*4, y-68+Math.sin(i)*1.5, 4.5, 0, Math.PI*2); ctx.fill(); } }
-  else if(a.hairStyle==='braids'){ for(let i=0;i<5;i++){ ctx.fillRect(x+6+i*3, y-68, 2, 12); } }
-  else { ctx.fillRect(x, y-68, 24, 9); }
-}
-
-function roundRect(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.lineTo(x+w-r,y); c.quadraticCurveTo(x+w,y,x+w,y+r); c.lineTo(x+w,y+h-r); c.quadraticCurveTo(x+w,y+h,x+w-r,y+h); c.lineTo(x+r,y+h); c.quadraticCurveTo(x,y+h,x,y+h-r); c.lineTo(x,y+r); c.quadraticCurveTo(x,y,x+r,y); }
-
-/* ========= Small utils ========= */
-function byId(id){return document.getElementById(id)} function qsa(s){return Array.from(document.querySelectorAll(s))}
-function clamp(n,a,b){return Math.max(a,Math.min(b,n))} function rid(){return Math.random().toString(36).slice(2)}
-function hour(){return Math.floor((state.t/60)%24)}
-function timePass(m){state.t+=m}
-function randInt(n){return Math.floor(Math.random()*(n+1))}
-function bump(key,amt){ state[key]=clamp(state[key]+amt,0,100) }
-function fmtHours([o,c]){ return o<12?(o+'a'):(o===12?'12p':((o-12)+'p')) + '–' + (c===0?'12a':(c<12?c+'a':(c===12?'12p':(c-12)+'p'))) }
-
-/* ========= HUD updates ========= */
-function setBars(){
-  energyEl.style.width=state.energy+'%';
-  hungerEl.style.width=(100-state.hunger)+'%';
-  funEl.style.width=state.fun+'%';
-  cleanEl.style.width=state.clean+'%';
-  eduEl.style.width=state.edu+'%';
-  repEl.style.width=state.rep+'%';
-  moneyEl.textContent='$'+Math.floor(state.money);
-  jobLabel.textContent = state.job ? JOBS[state.job].name : 'Unemployed';
-  const h=Math.floor((state.t/60)%24), m=Math.floor(state.t%60); const am=h>=12?'PM':'AM', hh=((h+11)%12+1); clockEl.textContent=`${hh}:${m.toString().padStart(2,'0')} ${am}`;
-}
-
-/* ========= Toast + audio ========= */
-let audioCtx;
-function blip(freq=440,dur=.05,type='sine',gain=.05){ if(!state.sound) return; try{
-  audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
-  const t=audioCtx.currentTime,o=audioCtx.createOscillator(),g=audioCtx.createGain();
-  o.type=type; o.frequency.value=freq; g.gain.value=gain; o.connect(g); g.connect(audioCtx.destination);
-  o.start(t); o.stop(t+dur); g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
-} catch{} }
-function toastMsg(msg,ms=1200){ toast.textContent=msg; toast.hidden=false; clearTimeout(toastMsg._t); toastMsg._t=setTimeout(()=>toast.hidden=true, ms); }
-
-/* ========= Init ========= */
-spawnNpc(); renderNpcList(); setBars();
-})();
+function byId(id){return document.getElementById(id);}
+function qsa(sel){return document.querySelectorAll(sel);}
+function clamp(v,min,max){return Math.min(Math.max(v,min),max);}
 </script>
+
 </body>
 </html>
