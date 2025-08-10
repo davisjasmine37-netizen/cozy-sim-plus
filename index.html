@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Cozy Sim Plus — Single File</title>
+<meta name="theme-color" content="#0f1318">
+<style>
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:#0f1318;color:#e7ecf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+header,footer{position:fixed;left:0;right:0;background:#121821;display:flex;justify-content:space-between;align-items:center;padding:10px 14px;z-index:3}
+header{top:0;box-shadow:0 2px 12px rgba(0,0,0,.35)}
+footer{bottom:0;gap:8px;justify-content:center}
+#title{font-weight:700}
+.pill{font-size:12px;margin-left:6px;background:#1b2430;border-radius:999px;padding:2px 8px;opacity:.85}
+.left,.right{display:flex;align-items:center;gap:14px}
+#jobLabel{opacity:.9}
+main{position:fixed;left:0;right:0;top:54px;bottom:64px;display:flex;flex-direction:column;gap:10px;padding:10px}
+#room{flex:1;border-radius:14px;background:#0b0f14;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px rgba(0,0,0,.4)}
+#hud{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bar{display:flex;align-items:center;gap:8px}
+.bar label{width:72px;opacity:.85}
+.meter{flex:1;height:10px;background:#18202a;border-radius:999px;overflow:hidden}
+.meter span{display:block;height:100%;background:linear-gradient(90deg,#4fd1ff,#7cffb2)}
+#tabs{display:flex;gap:8px}
+#tabs button{padding:10px 12px;border:0;border-radius:10px;background:#17202a;color:#e7ecf2}
+#tabs button.active{outline:2px solid rgba(255,255,255,.15)}
+.panel{display:none}
+.panel.active{display:block}
+#actions.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#actions button{padding:12px;border:0;border-radius:12px;background:#17202a;color:#e7ecf2;box-shadow:0 2px 0 rgba(255,255,255,.04) inset, 0 6px 16px rgba(0,0,0,.35)}
+#actions button:active{transform:translateY(1px)}
+#shop{background:#0e141b;border-radius:10px;padding:10px}
+.shop-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
+.shop-item{padding:10px;border:0;border-radius:10px;background:#17202a;color:#e7ecf2}
+.hint{opacity:.7;font-size:12px;margin-top:6px}
+.jobs{display:grid;grid-template-columns:1fr;gap:8px}
+.job{display:flex;justify-content:space-between;align-items:center;background:#0e141b;border-radius:10px;padding:10px}
+.job .name{font-weight:700}
+.job .info{opacity:.85;font-size:13px}
+.job .apply{padding:8px 12px;border:0;border-radius:10px;background:#1a2532;color:#e7ecf2}
+.npc-list{display:grid;grid-template-columns:1fr;gap:8px}
+.npc{display:flex;justify-content:space-between;align-items:center;background:#0e141b;border-radius:10px;padding:10px}
+.npc .meta{opacity:.85;font-size:13px}
+.npc .rel{font-weight:700}
+.npc-actions{margin-top:8px;background:#0e141b;border-radius:10px;padding:10px}
+.npc-actions .buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.npc-actions button{padding:10px;border:0;border-radius:10px;background:#17202a;color:#e7ecf2}
+#toast{position:fixed;left:50%;top:20%;transform:translateX(-50%);background:rgba(0,0,0,.65);padding:10px 14px;border-radius:10px;backdrop-filter:blur(8px);z-index:9}
+</style>
+</head>
+<body>
+<header>
+  <div class="left">
+    <div id="title">Cozy Sim <span class="pill">Plus</span></div>
+    <div id="clock">7:00 AM</div>
+  </div>
+  <div class="right">
+    <div id="jobLabel">Unemployed</div>
+    <div id="money">$0</div>
+  </div>
+</header>
+<main>
+  <canvas id="room" aria-label="Room view"></canvas>
+  <section id="hud">
+    <div class="bar"><label>Energy</label><div class="meter"><span id="energy"></span></div></div>
+    <div class="bar"><label>Hunger</label><div class="meter"><span id="hunger"></span></div></div>
+    <div class="bar"><label>Fun</label><div class="meter"><span id="fun"></span></div></div>
+    <div class="bar"><label>Clean</label><div class="meter"><span id="clean"></span></div></div>
+    <div class="bar"><label>Edu</label><div class="meter"><span id="edu"></span></div></div>
+    <div class="bar"><label>Rep</label><div class="meter"><span id="rep"></span></div></div>
+  </section>
+  <section id="tabs">
+    <button data-tab="actions" class="active">Actions</button>
+    <button data-tab="jobs">Jobs</button>
+    <button data-tab="relationships">Relationships</button>
+  </section>
+  <section id="panel-actions" class="panel active">
+    <div id="actions" class="grid">
+      <button data-act="eat">Eat 🍲</button>
+      <button data-act="sleep">Sleep 😴</button>
+      <button data-act="shower">Shower 🚿</button>
+      <button data-act="play">Play 🎮</button>
+      <button data-act="clean">Clean 🧹</button>
+      <button data-act="study">Study 📚</button>
+      <button data-act="work">Work 💼</button>
+      <button data-act="decorate">Decor 🪑</button>
+    </div>
+    <div id="shop" hidden>
+      <div class="shop-row">
+        <button class="shop-item" data-item="sofa">Sofa $80</button>
+        <button class="shop-item" data-item="plant">Plant $20</button>
+        <button class="shop-item" data-item="tv">TV $120</button>
+        <button class="shop-item" data-item="bed">Bed $150</button>
+      </div>
+      <div class="hint">Drag furniture in Decor mode. Tap Decor to close.</div>
+    </div>
+  </section>
+  <section id="panel-jobs" class="panel">
+    <div class="jobs">
+      <div class="job" data-job="barista">
+        <div class="name">Barista</div>
+        <div class="info">Pay $16/hr • 6a–2p • No req</div>
+        <button class="apply">Apply</button>
+      </div>
+      <div class="job" data-job="stripper">
+        <div class="name">Performer (Club)</div>
+        <div class="info">Pay $28/hr + tips • 7p–2a • Audition</div>
+        <button class="apply">Audition</button>
+      </div>
+      <div class="job" data-job="lawyer">
+        <div class="name">Junior Lawyer</div>
+        <div class="info">Pay $55/hr • 9a–7p • Edu 70+</div>
+        <button class="apply">Apply</button>
+      </div>
+      <div class="job" data-job="doctor">
+        <div class="name">Resident Doctor</div>
+        <div class="info">Pay $60/hr • 7a–7p • Edu 85+</div>
+        <button class="apply">Apply</button>
+      </div>
+    </div>
+    <div class="hint">Once hired, tap Work on the Actions tab during open hours.</div>
+  </section>
+  <section id="panel-relationships" class="panel">
+    <div id="npcList" class="npc-list"></div>
+    <div id="npcActions" class="npc-actions" hidden>
+      <div id="npcName">—</div>
+      <div class="buttons">
+        <button data-npcact="chat">Chat 💬</button>
+        <button data-npcact="compliment">Compliment 🌟</button>
+        <button data-npcact="gift">Gift 🎁 ($25)</button>
+        <button data-npcact="date">Ask Out ❤️ ($40)</button>
+      </div>
+    </div>
+    <div class="hint">New NPCs appear each day. Build relationships to become partners.</div>
+  </section>
+</main>
+<div id="toast" hidden></div>
+<footer>
+  <button id="save">Save</button>
+  <button id="load">Load</button>
+  <button id="reset">Reset</button>
+  <button id="mute">🔊</button>
+</footer>
+<script>
+(()=>{
+
+  const canvas = document.getElementById('room');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  let W=0, H=0, DPR=Math.max(1, Math.min(2, window.devicePixelRatio||1));
+  function resize(){ W=window.innerWidth-20; H=Math.max(260, window.innerHeight-54-64-220); canvas.width=Math.floor(W*DPR); canvas.height=Math.floor(H*DPR); canvas.style.width=W+'px'; canvas.style.height=H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); }
+  window.addEventListener('resize', resize, {passive:true}); resize();
+
+  const energyEl = document.getElementById('energy');
+  const hungerEl = document.getElementById('hunger');
+  const funEl = document.getElementById('fun');
+  const cleanEl = document.getElementById('clean');
+  const eduEl = document.getElementById('edu');
+  const repEl = document.getElementById('rep');
+  const moneyEl = document.getElementById('money');
+  const jobLabel = document.getElementById('jobLabel');
+  const clockEl = document.getElementById('clock');
+  const toast = document.getElementById('toast');
+  const tabs = document.getElementById('tabs');
+  const panels = {
+    actions: document.getElementById('panel-actions'),
+    jobs: document.getElementById('panel-jobs'),
+    relationships: document.getElementById('panel-relationships')
+  };
+  const actionsWrap = document.getElementById('actions');
+  const saveBtn = document.getElementById('save');
+  const loadBtn = document.getElementById('load');
+  const resetBtn = document.getElementById('reset');
+  const muteBtn = document.getElementById('mute');
+
+  const npcList = document.getElementById('npcList');
+  const npcActions = document.getElementById('npcActions');
+  const npcName = document.getElementById('npcName');
+
+  const state = {
+    t: 7*60,
+    energy: 70, hunger: 30, fun: 40, clean: 60,
+    edu: 10, rep: 10, money: 120,
+    sound: true,
+    job: null,
+    grid: {cols:12, rows:8},
+    items: [
+      {id:'bed', x:2,y:2,w:2,h:3,color:'#46506a',name:'Bed'},
+      {id:'sofa', x:6,y:3,w:3,h:2,color:'#6a5046',name:'Sofa'},
+      {id:'tv', x:4,y:6,w:2,h:1,color:'#2d2f38',name:'TV'},
+      {id:'plant', x:9,y:2,w:1,h:1,color:'#4c7a57',name:'Plant'}
+    ],
+    decorMode: false, dragging: null,
+    npcs: [], selectedNpc: null,
+    lastNpcDay: -1,
+    performance: { shifts:0, ontime:0 },
+  };
+
+  const JOBS = {
+    barista: { name:'Barista', open:[6,14], pay:16, reqEdu:0, audition:false },
+    stripper: { name:'Performer (Club)', open:[19,2], pay:28, reqEdu:0, audition:true },
+    lawyer: { name:'Junior Lawyer', open:[9,19], pay:55, reqEdu:70, audition:false },
+    doctor: { name:'Resident Doctor', open:[7,19], pay:60, reqEdu:85, audition:false },
+  };
+
+  let audioCtx;
+  function blip(freq=440, dur=0.05, type='sine', gain=0.05){
+    if (!state.sound) return;
+    try{
+      audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+      const t = audioCtx.currentTime;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type=type; o.frequency.value=freq;
+      g.gain.value=gain; o.connect(g); g.connect(audioCtx.destination);
+      o.start(t); o.stop(t+dur); g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+    }catch{}
+  }
+
+  function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
+  function hour(){ return Math.floor((state.t/60)%24); }
+  function timeFmt(mins){ const h=Math.floor((mins/60)%24), m=mins%60, ampm=h>=12?'PM':'AM', hh=((h+11)%12+1); return `${hh}:${m.toString().padStart(2,'0')} ${ampm}`; }
+  function setBars(){
+    energyEl.style.width = state.energy+'%';
+    hungerEl.style.width = (100-state.hunger)+'%';
+    funEl.style.width = state.fun+'%';
+    cleanEl.style.width = state.clean+'%';
+    eduEl.style.width = state.edu+'%';
+    repEl.style.width = state.rep+'%';
+    moneyEl.textContent = '$'+Math.floor(state.money);
+    jobLabel.textContent = state.job ? JOBS[state.job].name : 'Unemployed';
+    clockEl.textContent = timeFmt(state.t);
+  }
+  function toastMsg(msg, ms=1200){ toast.textContent=msg; toast.hidden=false; clearTimeout(toastMsg._t); toastMsg._t=setTimeout(()=>toast.hidden=true, ms); }
+
+  tabs.addEventListener('click', e=>{
+    const btn = e.target.closest('button'); if (!btn) return;
+    document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    Object.values(panels).forEach(p=>p.classList.remove('active'));
+    panels[tab].classList.add('active');
+  });
+
+  let last = performance.now();
+  function loop(now){
+    const dt = Math.min(50, now-last); last=now;
+    update(dt/1000);
+    render();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  function update(dt){
+    state.t += dt*6;
+
+    state.hunger = clamp(state.hunger + 0.6*dt, 0, 100);
+    state.energy = clamp(state.energy - 0.4*dt, 0, 100);
+    state.clean  = clamp(state.clean - 0.2*dt, 0, 100);
+    state.fun    = clamp(state.fun - 0.15*dt, 0, 100);
+
+    const d = Math.floor(state.t/(24*60));
+    if (d !== state.lastNpcDay){
+      state.lastNpcDay = d;
+      spawnNpcs();
+    }
+
+    setBars();
+  }
+
+  const NAMES = ['Alex','Jordan','Taylor','Riley','Casey','Sam','Avery','Kai','Morgan','Skye','Nina','Malik','Jada','Imani','Noah'];
+  function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function spawnNpcs(){
+    if (state.npcs.length<3){
+      for (let i=0;i<3;i++) addNpc();
+    } else {
+      const addCount = 1 + Math.floor(Math.random()*2);
+      for (let i=0;i<addCount;i++){
+        if (state.npcs.length>=5){
+          state.npcs.sort((a,b)=>a.rel-b.rel);
+          state.npcs.shift();
+        }
+        addNpc();
+      }
+    }
+    renderNpcList();
+  }
+  function addNpc(){
+    const name = rand(NAMES)+' '+(Math.random()<0.5?'B.':'C.');
+    state.npcs.push({
+      id: Math.random().toString(36).slice(2),
+      name,
+      rel: Math.floor(Math.random()*20)+5,
+      charm: Math.floor(Math.random()*50)+25,
+      interests: ['music','food','fitness','art','tech','travel'].sort(()=>.5-Math.random()).slice(0,2),
+      status: 'acquaintance'
+    });
+  }
+  function renderNpcList(){
+    npcList.innerHTML='';
+    state.npcs.forEach(n=>{
+      const div=document.createElement('div');
+      div.className='npc';
+      div.innerHTML = `<div><div class="name">${n.name}</div><div class="meta">Interests: ${n.interests.join(', ')}</div></div><div class="rel">${n.rel}</div>`;
+      div.addEventListener('click', ()=>selectNpc(n.id));
+      npcList.appendChild(div);
+    });
+  }
+  function selectNpc(id){
+    state.selectedNpc = state.npcs.find(n=>n.id===id) || null;
+    if (state.selectedNpc){
+      npcActions.hidden=false;
+      npcName.textContent = `${state.selectedNpc.name} • ${state.selectedNpc.status} • Rel ${state.selectedNpc.rel}`;
+    } else npcActions.hidden=true;
+  }
+
+  document.getElementById('panel-relationships').addEventListener('click', e=>{
+    const act = e.target.getAttribute('data-npcact'); if (!act) return;
+    const n = state.selectedNpc; if (!n){ toastMsg('Pick someone first'); return; }
+    if (act==='chat'){
+      state.fun = clamp(state.fun + 8,0,100);
+      n.rel = clamp(n.rel + (5 + Math.floor(Math.random()*6)), 0, 100);
+      timePass(20); toastMsg(`Chatted with ${n.name}`); blip(760,0.05,'sine',0.05);
+    }
+    if (act==='compliment'){
+      const gain = Math.random()<0.8 ? (6+Math.floor(Math.random()*6)) : 0;
+      n.rel = clamp(n.rel + gain, 0, 100);
+      timePass(10); toastMsg(gain? 'They smiled' : 'That landed awkward…');
+    }
+    if (act==='gift'){
+      if (state.money<25){ toastMsg('Need $25'); return; }
+      state.money -= 25; n.rel = clamp(n.rel + 10 + Math.floor(Math.random()*10), 0, 100);
+      timePass(10); toastMsg(`Gave ${n.name} a gift`); blip(640,0.05,'triangle',0.06);
+    }
+    if (act==='date'){
+      if (state.money<40){ toastMsg('Need $40'); return; }
+      state.money -= 40; state.fun = clamp(state.fun + 18,0,100); state.clean = clamp(state.clean - 6,0,100); state.energy = clamp(state.energy - 8,0,100);
+      const bonus = 12 + Math.floor(Math.random()*10);
+      n.rel = clamp(n.rel + bonus, 0, 100);
+      timePass(120); toastMsg(`Had a great date (+${bonus} rel)`);
+      if (n.rel>=70 && n.status!=='partner'){ n.status='partner'; toastMsg(`${n.name} is now your partner ❤️`, 1600); blip(520,0.06,'sine',0.06); }
+    }
+    renderNpcList(); selectNpc(n.id); setBars();
+  });
+
+  const actions = {
+    eat(){ if (state.money<8){ toastMsg('Need $8'); return; } state.money-=8; state.hunger=clamp(state.hunger-35,0,100); state.energy=clamp(state.energy+5,0,100); timePass(20); toastMsg('Ate a meal'); blip(520,0.05,'sine',0.06); },
+    sleep(){
+      let mins=0;
+      while(state.energy<95 && mins<8*60){ state.energy=clamp(state.energy+1.2,0,100); state.hunger=clamp(state.hunger+0.4,0,100); mins+=10; }
+      timePass(mins); toastMsg('You slept');
+    },
+    shower(){ state.clean=clamp(state.clean+35,0,100); state.energy=clamp(state.energy+2,0,100); timePass(15); toastMsg('Shower done'); },
+    play(){ state.fun=clamp(state.fun+28,0,100); state.energy=clamp(state.energy-6,0,100); timePass(40); toastMsg('Played games'); },
+    clean(){ state.clean=clamp(state.clean+28,0,100); state.energy=clamp(state.energy-5,0,100); timePass(30); toastMsg('Tidied up'); },
+    study(){ if (state.energy<20){ toastMsg('Too tired to study'); return; } state.edu=clamp(state.edu+6+Math.floor(Math.random()*4),0,100); state.energy=clamp(state.energy-10,0,100); state.fun=clamp(state.fun-4,0,100); timePass(50); toastMsg('Studied'); },
+    work(){
+      if (!state.job){ toastMsg('No job yet'); return; }
+      const j = JOBS[state.job];
+      const h = hour();
+      const open = j.open[0], close = j.open[1];
+      let isOpen = false;
+      if (open < close) isOpen = h>=open && h<close;
+      else isOpen = (h>=open || h<close);
+      if (!isOpen){ toastMsg('Your job is closed now'); return; }
+      const hours = 2 + Math.floor(Math.random()*3);
+      const mins = hours*60;
+      let pay = j.pay * hours;
+      if (state.job==='stripper'){ pay += Math.floor(Math.random()*80); }
+      const perf = (state.energy>40?1:0.7) * (state.clean>40?1:0.8);
+      state.money += Math.floor(pay * perf);
+      state.energy = clamp(state.energy - 12*hours/2, 0, 100);
+      state.hunger = clamp(state.hunger + 10*hours/2, 0, 100);
+      state.fun    = clamp(state.fun + (state.job==='stripper'? 4 : -4), 0, 100);
+      state.clean  = clamp(state.clean - 6*hours/2, 0, 100);
+      state.performance.shifts++; if (perf>=1) state.performance.ontime++;
+      if (state.performance.shifts>0 && state.performance.ontime>0 && state.performance.ontime % 6 === 0){
+        j.pay += 2; toastMsg('Nice work — you got a raise!');
+      } else {
+        toastMsg(`Worked ${hours}h, earned $${Math.floor(pay*perf)}`);
+      }
+      timePass(mins);
+    },
+    decorate(){ state.decorMode=!state.decorMode; document.getElementById('shop').hidden=!state.decorMode; toastMsg(state.decorMode?'Decorate mode on':'Decorate off'); }
+  };
+
+  document.getElementById('actions').addEventListener('click', e=>{
+    const act = e.target.getAttribute('data-act'); if (!act || !actions[act]) return;
+    actions[act](); setBars();
+  });
+
+  document.getElementById('panel-jobs').addEventListener('click', e=>{
+    const jDiv = e.target.closest('.job'); if (!jDiv) return;
+    const key = jDiv.dataset.job; const j = JOBS[key];
+    if (key==='stripper'){
+      const score = (state.fun + state.clean + state.rep)/3 + Math.random()*20;
+      if (score < 45){ toastMsg('Audition didn’t stick. Try again later.'); return; }
+      state.job = key; toastMsg('You got the gig at the club!');
+    } else {
+      if (state.edu < j.reqEdu){ toastMsg('Not qualified yet'); return; }
+      state.job = key; toastMsg(`Hired as ${j.name}`);
+    }
+    setBars();
+  });
+
+  document.querySelectorAll('.shop-item').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const type = btn.getAttribute('data-item');
+      const prices = {sofa:80, plant:20, tv:120, bed:150};
+      const colors = {sofa:'#6a5046', plant:'#4c7a57', tv:'#2d2f38', bed:'#46506a'};
+      const sizes = {sofa:[3,2], plant:[1,1], tv:[2,1], bed:[2,3]};
+      const price = prices[type];
+      if (state.money < price){ toastMsg('Not enough money'); return; }
+      state.money -= price;
+      const [w,h] = sizes[type];
+      state.items.push({id:type, x:1,y:1,w,h,color:colors[type],name:type[0].toUpperCase()+type.slice(1)});
+      toastMsg(`Bought ${type} for $${price}`);
+      blip(600,0.05,'triangle',0.06);
+      setBars();
+    });
+  });
+
+  function toCell(px,py){
+    const pad=16, gw=W-pad*2, gh=H-pad*2, cw=gw/state.grid.cols, ch=gh/state.grid.rows;
+    const x=clamp(Math.floor((px-pad)/cw),0,state.grid.cols-1); const y=clamp(Math.floor((py-pad)/ch),0,state.grid.rows-1);
+    return {x,y,cw,ch,pad,gw,gh};
+  }
+  function hitItem(px,py){
+    const {x,y} = toCell(px,py); for (let i=state.items.length-1;i>=0;i--){ const it=state.items[i]; if (x>=it.x && x<it.x+it.w && y>=it.y && y<it.y+it.h) return {it,i}; } return null;
+  }
+  canvas.addEventListener('pointerdown', e=>{
+    if (!state.decorMode) return;
+    const r=canvas.getBoundingClientRect(); const px=e.clientX-r.left, py=e.clientY-r.top; const h=hitItem(px,py);
+    if (h){ state.dragging = {idx:h.i, off:(()=>{ const c=toCell(px,py); return {dx:c.x-state.items[h.i].x, dy:c.y-state.items[h.i].y}; })()}; }
+  });
+  canvas.addEventListener('pointermove', e=>{
+    if (!state.dragging) return;
+    const r=canvas.getBoundingClientRect(); const px=e.clientX-r.left, py=e.clientY-r.top; const c=toCell(px,py);
+    const it=state.items[state.dragging.idx]; it.x=clamp(c.x-state.dragging.off.dx,0,state.grid.cols-it.w); it.y=clamp(c.y-state.dragging.off.dy,0,state.grid.rows-it.h);
+  });
+  canvas.addEventListener('pointerup', ()=>state.dragging=null);
+
+  function save(){ const data={v:2, ...state, selectedNpc:null, dragging:null}; try{ localStorage.setItem('cozysim_plus_sf', JSON.stringify(data)); toastMsg('Saved'); blip(800,0.04,'sine',0.05);}catch{toastMsg('Save failed');} }
+  function load(){ const raw=localStorage.getItem('cozysim_plus_sf'); if (!raw){ toastMsg('No save'); return; } try{ const d=JSON.parse(raw);
+    ['t','energy','hunger','fun','clean','edu','rep','money','job','items','npcs','lastNpcDay','performance'].forEach(k=>{ if (d[k]!==undefined) state[k]=d[k]; });
+    renderNpcList(); setBars(); toastMsg('Loaded'); blip(520,0.05,'sine',0.05);
+  }catch{ toastMsg('Load failed'); } }
+  function reset(){ try{ localStorage.removeItem('cozysim_plus_sf'); }catch{} location.reload(); }
+  document.getElementById('save').addEventListener('click', save);
+  document.getElementById('load').addEventListener('click', load);
+  document.getElementById('reset').addEventListener('click', reset);
+  muteBtn.addEventListener('click', ()=>{ state.sound=!state.sound; muteBtn.textContent=state.sound?'🔊':'🔇'; });
+
+  function timePass(mins){ state.t += mins; }
+
+  function render(){
+    const hour = Math.floor((state.t/60)%24);
+    const skyTop = hour>=19||hour<=6 ? '#070a11' : '#0e1217';
+    const skyBot = hour>=19||hour<=6 ? '#0c1018' : '#141a21';
+    const g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,skyTop); g.addColorStop(1,skyBot);
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    const pad=16, gw=W-pad*2, gh=H-pad*2, cw=gw/state.grid.cols, ch=gh/state.grid.rows;
+    ctx.save(); ctx.translate(pad,pad);
+    ctx.fillStyle='#151b24'; ctx.fillRect(0,0,gw,gh);
+    ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1;
+    for (let c=1;c<state.grid.cols;c++){ ctx.beginPath(); ctx.moveTo(c*cw,0); ctx.lineTo(c*cw,gh); ctx.stroke(); }
+    for (let r=1;r<state.grid.rows;r++){ ctx.beginPath(); ctx.moveTo(0,r*ch); ctx.lineTo(gw,r*ch); ctx.stroke(); }
+    for (const it of state.items){
+      ctx.fillStyle=it.color; ctx.fillRect(it.x*cw, it.y*ch, it.w*cw-2, it.h*ch-2);
+      ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.fillRect(it.x*cw, it.y*ch, it.w*cw-2, 4);
+      ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.font='12px system-ui'; ctx.fillText(it.name, it.x*cw+6, it.y*ch+16);
+    }
+    ctx.restore();
+  }
+
+  setBars(); spawnNpcs(); renderNpcList();
+
+})();
+</script>
+</body>
+</html>
