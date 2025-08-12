@@ -3,40 +3,38 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<title>Cozy Life 3D — Creator + Outfits</title>
+<title>Cozy Life — Isometric</title>
 <style>
-  *{box-sizing:border-box}html,body{height:100%;margin:0}
+  *{box-sizing:border-box} html,body{height:100%;margin:0}
   body{background:#0e141b;color:#e7ecf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;overflow:hidden}
-  header,footer{position:fixed;left:0;right:0;background:#111826;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;z-index:9}
+  header,footer{position:fixed;left:0;right:0;background:#111826;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;z-index:10}
   header{top:0;box-shadow:0 2px 12px rgba(0,0,0,.35)}
-  footer{bottom:0;gap:8px;justify-content:center;flex-wrap:wrap}
+  footer{bottom:0;gap:8px;justify-content:center}
   .badge{background:#1a2330;padding:2px 8px;border-radius:999px;font-size:12px}
-  #bars{position:fixed;left:10px;right:10px;top:56px;display:grid;grid-template-columns:1fr 1fr;gap:8px;z-index:8}
+  #bars{position:fixed;left:10px;right:10px;top:56px;display:grid;grid-template-columns:1fr 1fr;gap:8px;z-index:9}
   .bar{display:flex;gap:8px;align-items:center}.bar label{width:80px;opacity:.85}
   .meter{flex:1;height:10px;background:#16202b;border-radius:999px;overflow:hidden}
   .meter span{display:block;height:100%;background:linear-gradient(90deg,#4fd1ff,#7cffb2)}
-  #tabs{position:fixed;left:10px;right:10px;top:124px;display:flex;gap:8px;z-index:8;flex-wrap:wrap}
+  #tabs{position:fixed;left:10px;right:10px;top:124px;display:flex;gap:8px;z-index:9;flex-wrap:wrap}
   #tabs button{padding:10px 12px;border:0;border-radius:12px;background:#17212c;color:#e7ecf2}
   #tabs button.active{outline:2px solid rgba(255,255,255,.15)}
-  .panel{position:fixed;left:10px;right:10px;bottom:74px;background:#0f151d;border-radius:14px;padding:10px;display:none;z-index:8}
+  .panel{position:fixed;left:10px;right:10px;bottom:74px;background:#0f151d;border-radius:14px;padding:10px;display:none;z-index:9}
   .panel.active{display:block}
   .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   .list{display:grid;gap:8px}
   .card{display:flex;justify-content:space-between;align-items:center;background:#121a24;border-radius:12px;padding:10px 12px}
   .name{font-weight:700}.meta{opacity:.85;font-size:13px}
-  #rooms{position:fixed;right:10px;top:86px;display:flex;gap:6px;z-index:8}
-  #rooms button{padding:8px 10px;border:0;border-radius:10px;background:#1a2330;color:#e7ecf2;font-size:12px}
   #toast{position:fixed;left:50%;top:22%;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:10px 14px;border-radius:10px;backdrop-filter:blur(8px);z-index:99}
-  #centerCam{position:fixed;left:10px;bottom:140px;z-index:8;border:0;border-radius:10px;background:#1a2330;color:#e7ecf2;padding:8px 10px}
   canvas{position:fixed;inset:0}
+  #rooms{position:fixed;right:10px;top:86px;display:flex;gap:6px;z-index:9}
+  #rooms button{padding:8px 10px;border:0;border-radius:10px;background:#1a2330;color:#e7ecf2;font-size:12px}
   #p-me label{display:flex;flex-direction:column;gap:6px;font-size:14px}
   #p-me input[type=range], #p-me select{width:100%;padding:8px;border:0;border-radius:10px;background:#17212c;color:#e7ecf2}
 </style>
 </head>
 <body>
 <header>
-  <div>Cozy Life <span class="badge">3D</span></div>
+  <div>Cozy Life <span class="badge">2D Iso</span></div>
   <div><span id="clock">7:00 AM</span> • <span id="job">Unemployed</span> • $<span id="money">120</span></div>
 </header>
 
@@ -50,14 +48,13 @@
   <div class="bar"><label>Rep</label><div class="meter"><span id="bRep"></span></div></div>
 </div>
 
-<!-- rooms quick nav -->
+<!-- quick room buttons -->
 <div id="rooms">
   <button data-room="living">Living</button>
   <button data-room="kitchen">Kitchen</button>
   <button data-room="bathroom">Bathroom</button>
   <button data-room="bedroom">Bedroom</button>
 </div>
-<button id="centerCam">Center Camera</button>
 
 <!-- tabs -->
 <div id="tabs">
@@ -79,13 +76,11 @@
     <button data-act="clean">Clean 🧹</button>
     <button data-act="save">Save 💾</button>
   </div>
-  <div class="meta">Tip: **Tap the floor** to walk. **Tap sofa/bed/shower/counter** to auto-walk and do it.</div>
+  <div class="meta">Tap the floor to walk. Tap **sofa/bed/shower/kitchen/TV** to auto-walk and do it.</div>
 </section>
 
 <!-- jobs -->
-<section id="p-jobs" class="panel">
-  <div id="jobsList" class="list"></div>
-</section>
+<section id="p-jobs" class="panel"><div id="jobsList" class="list"></div></section>
 
 <!-- relationships -->
 <section id="p-relationships" class="panel">
@@ -101,7 +96,7 @@
   </div>
 </section>
 
-<!-- ME: simple character creator + outfits -->
+<!-- me -->
 <section id="p-me" class="panel">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
     <label>Skin tone
@@ -129,343 +124,299 @@
         <option value="#2b2b2b">Gray</option>
       </select>
     </label>
-
-    <div style="grid-column:1 / span 2;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#121a24;border-radius:10px;padding:10px">
-      <div style="font-weight:700;opacity:.9">Simple Character Creator</div><div></div>
-      <label>Height <input id="ccHeight" type="range" min="0.9" max="1.2" step="0.01" value="1.00"></label>
-      <label>Head size <input id="ccHead" type="range" min="0.8" max="1.3" step="0.01" value="1.00"></label>
-      <label>Eye size <input id="ccEyeSize" type="range" min="0.6" max="1.4" step="0.02" value="1.00"></label>
-      <label>Eye gap <input id="ccEyeGap" type="range" min="-8" max="8" step="1" value="0"></label>
-      <label>Nose length <input id="ccNose" type="range" min="0.8" max="1.4" step="0.02" value="1.00"></label>
-      <label>Mouth width <input id="ccMouth" type="range" min="0.6" max="1.6" step="0.02" value="1.00"></label>
-      <div style="grid-column:1 / span 2;display:flex;gap:8px">
-        <button id="ccRandom">Randomize</button>
-        <button id="ccSave">Save Look</button>
-      </div>
-    </div>
-
-    <div style="grid-column:1 / span 2;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <span class="badge">Outfit</span>
-      <button id="outfitPrev">◀︎</button>
-      <span id="outfitName" class="badge">Casual</span>
-      <button id="outfitNext">▶︎</button>
+    <label>Outfit
+      <select id="outfit">
+        <option value="casual" selected>Casual (sneakers)</option>
+        <option value="work">Work (flats)</option>
+        <option value="gym">Gym (sneakers)</option>
+        <option value="night">Night Out (heels)</option>
+        <option value="cozy">Cozy (boots)</option>
+      </select>
+    </label>
+    <div style="grid-column:1 / span 2;display:flex;gap:8px;align-items:center">
       <span class="badge">Time</span><input id="time" type="range" min="0.5" max="6" step="0.5" value="2" style="width:160px"><span id="tLbl" class="badge">2 min/sec</span>
     </div>
   </div>
 </section>
 
 <div id="toast" hidden></div>
-<canvas id="webgl"></canvas>
-<footer>
-  <button id="load">Load</button>
-  <button id="reset">Reset</button>
-</footer>
-
-<!-- Three.js -->
-<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<canvas id="cv"></canvas>
+<footer><button id="load">Load</button><button id="reset">Reset</button></footer>
 
 <script>
-(()=>{ // ===== GAME =====
-/* ---------- helpers ---------- */
-const $=id=>document.getElementById(id), $$=s=>Array.from(document.querySelectorAll(s));
+(()=>{ // ===== ISO ENGINE =====
+const $=id=>document.getElementById(id), $$=q=>Array.from(document.querySelectorAll(q));
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-const hour=t=>Math.floor((t/60)%24);
-const timeFmt=m=>{const h=hour(m),mi=Math.floor(m%60),ap=h>=12?'PM':'AM',hh=((h+11)%12+1);return `${hh}:${String(mi).padStart(2,'0')} ${ap}`;}
-function toast(msg,ms=1200){const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._h); toast._h=setTimeout(()=>t.hidden=true,ms);}
+const R=window.devicePixelRatio||1;
+const cv=$('cv'), cx=cv.getContext('2d');
+function size(){cv.width=Math.floor(innerWidth*R); cv.height=Math.floor((innerHeight)*R); cv.style.width=innerWidth+'px'; cv.style.height=innerHeight+'px';}
+addEventListener('resize',size,{passive:true}); size();
 
-/* ---------- outfits (top/bottom/shoes + shoe style) ---------- */
-const OUTFITS=[
-  {name:'Casual', top:0xa86dff, bottom:0x22252d, shoes:0xe7ecf2, shoe:'sneaker'},
-  {name:'Work',   top:0x2ec27e, bottom:0x1f2a22, shoes:0xf1f5f9, shoe:'flat'},
-  {name:'Gym',    top:0x4fd1ff, bottom:0x14202a, shoes:0xc8f7ff, shoe:'sneaker'},
-  {name:'Night',  top:0xff6b9a, bottom:0x2a2e39, shoes:0xf5d36b, shoe:'heel'},
-  {name:'Cozy',   top:0x8ad7a0, bottom:0x314b3c, shoes:0xeaeaea, shoe:'boot'}
-];
-
-/* ---------- state ---------- */
-const S={room:'living',t:7*60,speed:2,energy:70,hunger:30,fun:40,clean:60,edu:10,rep:10,money:120,job:null,npcs:[],sel:null,lastNpcDay:-1};
-const A={skin:'#2c1f16',hair:'#0c0b0c',hairStyle:'curls',body:'curvy',outfit:0};
-const CC={height:1.00,head:1.00,eyeSize:1.00,eyeGap:0,nose:1.00,mouth:1.00}; // creator sliders
-const JOBS={barista:{name:'Barista',open:[6,14],pay:16,req:0},stripper:{name:'Performer (Club)',open:[19,2],pay:28,req:0,audition:true},lawyer:{name:'Junior Lawyer',open:[9,19],pay:55,req:70},doctor:{name:'Resident Doctor',open:[7,19],pay:60,req:85}};
+/* ===== GAME STATE ===== */
+const S={t:7*60,speed:2,energy:70,hunger:30,fun:40,clean:60,edu:10,rep:10,money:120,job:null,room:'living',npcs:[],sel:null,lastNpcDay:-1};
+const A={skin:'#2c1f16',hair:'#0c0b0c',hairStyle:'curls',outfit:'casual'};
+const JOBS={barista:{name:'Barista',open:[6,14],pay:16,req:0},stripper:{name:'Performer',open:[19,2],pay:28,req:0,audition:true},lawyer:{name:'Lawyer',open:[9,19],pay:55,req:70},doctor:{name:'Doctor',open:[7,19],pay:60,req:85}};
 const rand=n=>Math.floor(Math.random()*n);
 
-/* ---------- UI ---------- */
-$('jobsList').innerHTML = Object.keys(JOBS).map(k=>{const j=JOBS[k];return `<div class="card" data-job="${k}"><div><div class="name">${j.name}</div><div class="meta">$${j.pay}/hr • ${fmtHours(j.open)} • ${j.req?('Edu '+j.req+'+'): 'No req'}</div></div><button>${k==='stripper'?'Audition':'Apply'}</button></div>`}).join('');
+/* ===== UI HOOKS ===== */
+$('jobsList').innerHTML=Object.keys(JOBS).map(k=>{const j=JOBS[k];return `<div class="card" data-job="${k}"><div><div class="name">${j.name}</div><div class="meta">$${j.pay}/hr • ${fmtHours(j.open)} • ${j.req?('Edu '+j.req+'+'): 'No req'}</div></div><button>${k==='stripper'?'Audition':'Apply'}</button></div>`}).join('');
 $('p-jobs').addEventListener('click',e=>{
-  const c=e.target.closest('.card'); if(!c) return;
-  const k=c.dataset.job, j=JOBS[k];
+  const c=e.target.closest('.card'); if(!c) return; const k=c.dataset.job, j=JOBS[k];
   if(k==='stripper'){ const score=(S.fun+S.clean+S.rep)/3+Math.random()*20; if(score<45) return toast('Audition didn’t stick'); S.job=k; }
-  else { if(S.edu<j.req) return toast('Not qualified yet'); S.job=k; }
+  else { if(S.edu<j.req) return toast('Not qualified'); S.job=k; }
   $('job').textContent=JOBS[S.job].name; toast('Hired!');
 });
 $('tabs').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; $$('#tabs button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); $$('.panel').forEach(p=>p.classList.remove('active')); $('p-'+b.dataset.tab).classList.add('active');});
-$('rooms').addEventListener('click',e=>{const r=e.target.getAttribute('data-room'); if(!r)return; switchRoom(r,true);});
-$('acts').addEventListener('click',e=>{const k=e.target.getAttribute('data-act'); if(!k) return; ({eat, sleep, shower, tv, study, work, clean, save})[k](); setBars();});
-$('skin').addEventListener('change',e=>{A.skin=e.target.value; drawFace();});
-$('hairStyle').addEventListener('change',e=>{A.hairStyle=e.target.value; drawFace();});
-$('hairColor').addEventListener('change',e=>{A.hair=e.target.value; hair.material.color.set(A.hair); drawFace();});
-
-/* outfit controls */
+$('rooms').addEventListener('click',e=>{const r=e.target.getAttribute('data-room'); if(!r)return; S.room=r;});
+$('acts').addEventListener('click',e=>{const k=e.target.getAttribute('data-act'); if(!k)return; ({eat,sleep,shower,tv,study,work,clean,save})[k](); setBars();});
+$('skin').onchange=e=>{A.skin=e.target.value;};
+$('hairStyle').onchange=e=>{A.hairStyle=e.target.value;};
+$('hairColor').onchange=e=>{A.hair=e.target.value;};
+$('outfit').onchange=e=>{A.outfit=e.target.value;};
 const tSlider=$('time'), tLbl=$('tLbl'); tSlider.value=S.speed; tLbl.textContent=S.speed+' min/sec';
-tSlider.addEventListener('input',()=>{S.speed=parseFloat(tSlider.value); tLbl.textContent=S.speed+' min/sec';});
-$('outfitPrev').addEventListener('click',()=>{A.outfit=(A.outfit-1+OUTFITS.length)%OUTFITS.length; applyOutfit();});
-$('outfitNext').addEventListener('click',()=>{A.outfit=(A.outfit+1)%OUTFITS.length; applyOutfit();});
-$('load').addEventListener('click',load); $('reset').addEventListener('click',()=>{localStorage.removeItem('cozy3d_creator2');location.reload();});
-$('centerCam').addEventListener('click',resetView);
+tSlider.oninput=()=>{S.speed=parseFloat(tSlider.value); tLbl.textContent=S.speed+' min/sec';};
+$('load').onclick=load; $('reset').onclick=()=>{localStorage.removeItem('cozy_iso'); location.reload();};
 
-/* creator inputs */
-['ccHeight','ccHead','ccEyeSize','ccEyeGap','ccNose','ccMouth'].forEach(id=>{
-  const el=$(id); el.addEventListener('input', ()=>{
-    CC.height = parseFloat($('ccHeight').value);
-    CC.head   = parseFloat($('ccHead').value);
-    CC.eyeSize= parseFloat($('ccEyeSize').value);
-    CC.eyeGap = parseFloat($('ccEyeGap').value);
-    CC.nose   = parseFloat($('ccNose').value);
-    CC.mouth  = parseFloat($('ccMouth').value);
-    applyCreator();
-  });
-});
-$('ccRandom').addEventListener('click', ()=>{
-  const r=(a,b)=> (Math.random()*(b-a)+a);
-  CC.height = +(r(0.92,1.18)).toFixed(2);
-  CC.head   = +(r(0.85,1.25)).toFixed(2);
-  CC.eyeSize= +(r(0.70,1.30)).toFixed(2);
-  CC.eyeGap = Math.round(r(-6,6));
-  CC.nose   = +(r(0.90,1.30)).toFixed(2);
-  CC.mouth  = +(r(0.80,1.40)).toFixed(2);
-  ccHeight.value=CC.height; ccHead.value=CC.head; ccEyeSize.value=CC.eyeSize; ccEyeGap.value=CC.eyeGap; ccNose.value=CC.nose; ccMouth.value=CC.mouth;
-  applyCreator();
-});
-$('ccSave').addEventListener('click', ()=>{
-  localStorage.setItem('cozy3d_creator2', JSON.stringify({S,A,CC}));
-  toast('Look saved');
-});
-
-/* ---------- 3D ---------- */
-const R=new THREE.WebGLRenderer({canvas:$('webgl'),antialias:true}); R.setPixelRatio(Math.min(2,devicePixelRatio||1));
-const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0a1016);
-const camera=new THREE.PerspectiveCamera(55,1,0.1,100); camera.position.set(0,6,10);
-const hemi=new THREE.HemisphereLight(0xffffff,0x223344,1.35); scene.add(hemi);
-const sun=new THREE.DirectionalLight(0xffffff,0.9); sun.position.set(2,8,5); sun.castShadow=true; scene.add(sun);
-function onResize(){const w=innerWidth,h=innerHeight; R.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix();}
-addEventListener('resize',onResize,{passive:true}); onResize();
-
-/* Floor per room */
-const floorGeo=new THREE.PlaneGeometry(20,14);
-const floors={
-  living : new THREE.Mesh(floorGeo,new THREE.MeshStandardMaterial({color:0x202830,roughness:.9})),
-  kitchen: new THREE.Mesh(floorGeo,new THREE.MeshStandardMaterial({color:0x303820,roughness:.85})),
-  bathroom:new THREE.MeshStandardMaterial?null:null
+/* ===== ISO MAP ===== */
+const TILE=48*R, HALF=TILE/2, ORG={x:cv.width/2, y:220*R}; // origin
+const ROOMS={
+  living:{w:9,h:7,floor:'#2a3341',walls:'#121a24',items:[
+    {type:'sofa',x:4,y:5},{type:'tv',x:2,y:3},{type:'plant',x:7,y:4},{type:'rug',x:4,y:4}
+  ]},
+  kitchen:{w:9,h:7,floor:'#3a3b2a',walls:'#121a24',items:[
+    {type:'counter',x:4,y:3},{type:'fridge',x:6,y:3},{type:'plant',x:2,y:5}
+  ]},
+  bathroom:{w:7,h:6,floor:'#2b3640',walls:'#121a24',items:[
+    {type:'shower',x:5,y:3},{type:'sink',x:3,y:3},{type:'rug',x:3,y:4}
+  ]},
+  bedroom:{w:9,h:7,floor:'#2f2834',walls:'#121a24',items:[
+    {type:'bed',x:5,y:4},{type:'dresser',x:2,y:3},{type:'plant',x:7,y:5},{type:'rug',x:5,y:5}
+  ]}
 };
-floors.bathroom=new THREE.Mesh(floorGeo,new THREE.MeshStandardMaterial({color:0x283036,roughness:.85}));
-floors.bedroom = new THREE.Mesh(floorGeo,new THREE.MeshStandardMaterial({color:0x2e2530,roughness:.85}));
-Object.values(floors).forEach(m=>{m.rotation.x=-Math.PI/2;m.receiveShadow=true;});
+const DOORS={living:[['kitchen',1,6],['bathroom',8,1]], kitchen:[['living',1,1],['bedroom',8,6]], bathroom:[['living',1,3]], bedroom:[['kitchen',1,3]]};
 
-/* Furniture */
-const room = new THREE.Group(); scene.add(room);
-function box(w,h,d,c){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:c,roughness:.8})); m.castShadow=true; m.receiveShadow=true; return m;}
-function furnFor(r){
-  const g=new THREE.Group();
-  if(r==='living'){const sofa=box(3,1,1,0x8a685a); sofa.position.set(0,0.5,-2); sofa.userData={type:'tv'}; g.add(sofa); const tv=box(2,1.2,0.5,0x1d2129); tv.position.set(-6,0.6,2); tv.userData={type:'tv'}; g.add(tv);}
-  if(r==='kitchen'){const counter=box(8,1,1,0x555555); counter.position.set(0,0.5,-3); counter.userData={type:'eat'}; g.add(counter);}
-  if(r==='bathroom'){const sh=box(1.2,2,1.2,0x2a3a44); sh.position.set(5,1,-1); sh.userData={type:'shower'}; g.add(sh);}
-  if(r==='bedroom'){const bed=box(4,1,2,0x7a89c2); bed.position.set(0,0.5,-2); bed.userData={type:'sleep'}; g.add(bed);}
-  return g;
-}
+/* ===== PLAYER & NPCs ===== */
+const P={x:4,y:5,px:4,py:5,tx:null,ty:null,flip:1};
+const NPCS=[];
+function spawnNpc(){ if(NPCS.length>=3) return; NPCS.push({name:randName(),x:2+rand(5),y:2+rand(3),rel:10+rand(15),vx:Math.random()<.5?-0.2:0.2}); renderNpcList(); }
 
-/* Doors */
-const doorGroup=new THREE.Group(); scene.add(doorGroup);
-const DOORS={living:[{x:-9,z:0,to:'kitchen'},{x:9,z:0,to:'bathroom'}],
-             kitchen:[{x:9,z:0,to:'living'},{x:-9,z:0,to:'bedroom'}],
-             bathroom:[{x:-9,z:0,to:'living'}],
-             bedroom:[{x:9,z:0,to:'kitchen'}]};
-function drawDoors(r){ doorGroup.clear(); (DOORS[r]||[]).forEach(d=>{const m=box(0.8,2.2,0.2,0x1a2330); m.position.set(d.x,1.1,d.z); m.userData.to=d.to; doorGroup.add(m);}); }
-
-/* -------- Player (rounder body + arms + shoes + face plate) -------- */
-const player=new THREE.Group(); scene.add(player);
-
-const faceCan=document.createElement('canvas'); faceCan.width=256; faceCan.height=256; const faceTex=new THREE.CanvasTexture(faceCan);
-
-// rounded, tapered torso (capsule) with slight waist/hip shaping by scale
-const torso=new THREE.Mesh(new THREE.CapsuleGeometry(0.46,1.25,12,20), new THREE.MeshStandardMaterial({color:OUTFITS[A.outfit].top,roughness:.7}));
-torso.position.y=1.65; torso.castShadow=true; player.add(torso);
-
-// shoulders (subtle)
-const shoulderL=new THREE.Mesh(new THREE.SphereGeometry(0.23,20,20), new THREE.MeshStandardMaterial({color:OUTFITS[A.outfit].top}));
-const shoulderR=shoulderL.clone(); shoulderL.position.set(-0.46,2.15,0); shoulderR.position.set(0.46,2.15,0); player.add(shoulderL,shoulderR);
-
-// arms (thin capsules)
-const armGeo=new THREE.CapsuleGeometry(0.16,0.55,8,16);
-const armL=new THREE.Mesh(armGeo,new THREE.MeshStandardMaterial({color:OUTFITS[A.outfit].top})); armL.position.set(-0.62,1.85,0); armL.rotation.z= Math.PI/12; player.add(armL);
-const armR=new THREE.Mesh(armGeo,new THREE.MeshStandardMaterial({color:OUTFITS[A.outfit].top})); armR.position.set(0.62,1.85,0); armR.rotation.z=-Math.PI/12; player.add(armR);
-
-// legs (capsules)
-const legGeo=new THREE.CapsuleGeometry(0.21,0.7,10,18);
-const legL=new THREE.Mesh(legGeo,new THREE.MeshStandardMaterial({color:OUTFITS[A.outfit].bottom})); legL.position.set(-0.2,0.65,0); player.add(legL);
-const legR=legL.clone(); legR.position.x=0.2; player.add(legR);
-
-// shoes (styles)
-let shoeL, shoeR;
-function buildShoes(style){
-  if(shoeL){ player.remove(shoeL,shoeR); }
-  const mat=new THREE.MeshStandardMaterial({color:OUTFITS[A.outfit].shoes,metalness:.1,roughness:.6});
-  if(style==='heel'){
-    shoeL=new THREE.Mesh(new THREE.ConeGeometry(0.22,0.25,18),mat); shoeL.rotation.x=Math.PI; shoeL.position.set(-0.2,0.08,0.05);
-    shoeR=shoeL.clone(); shoeR.position.x=0.2;
-  }else if(style==='boot'){
-    shoeL=new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.22,0.35,18),mat); shoeL.position.set(-0.2,0.18,0.1);
-    shoeR=shoeL.clone(); shoeR.position.x=0.2;
-  }else{ // sneaker/flat
-    shoeL=new THREE.Mesh(new THREE.BoxGeometry(0.38,0.18,0.62),mat); shoeL.position.set(-0.2,0.1,0.1);
-    shoeR=shoeL.clone(); shoeR.position.x=0.2;
+/* ===== RENDER ===== */
+function iso(x,y){return {x:ORG.x+(x-y)*HALF, y:ORG.y+(x+y)*HALF*0.5};}
+function drawRoom(){
+  const Rm=ROOMS[S.room];
+  // floor tiles
+  for(let y=0;y<Rm.h;y++){
+    for(let x=0;x<Rm.w;x++){
+      const p=iso(x,y);
+      // tile wood/plank shading
+      cx.fillStyle=Rm.floor; cx.beginPath();
+      cx.moveTo(p.x, p.y);
+      cx.lineTo(p.x+HALF, p.y+HALF*0.5);
+      cx.lineTo(p.x, p.y+HALF);
+      cx.lineTo(p.x-HALF, p.y+HALF*0.5);
+      cx.closePath(); cx.fill();
+    }
   }
-  shoeL.castShadow=shoeR.castShadow=true; player.add(shoeL,shoeR);
+  // walls (back)
+  cx.fillStyle=Rm.walls;
+  const back=iso(Rm.w-1,0); cx.fillRect(back.x-HALF, back.y-60*R, HALF*Rm.w*2, 60*R);
+  const side=iso(0,0); cx.fillRect(side.x-HALF*Rm.h, side.y-60*R, HALF*Rm.h*2, 60*R);
+  // window highlights
+  cx.fillStyle='#1f2937aa'; cx.fillRect(back.x-120*R, back.y-56*R, 80*R, 38*R);
+  cx.fillRect(side.x-160*R, side.y-56*R, 80*R, 38*R);
+}
+function drawItem(it){
+  const p=iso(it.x,it.y);
+  if(it.type==='rug'){ cx.fillStyle='#1d2330'; cx.beginPath(); cx.moveTo(p.x, p.y+HALF*0.3); cx.lineTo(p.x+HALF*0.9, p.y+HALF*0.75); cx.lineTo(p.x, p.y+HALF*1.2); cx.lineTo(p.x-HALF*0.9, p.y+HALF*0.75); cx.closePath(); cx.fill(); return;}
+  // simple sprites
+  cx.save(); cx.translate(p.x,p.y);
+  if(it.type==='sofa'){ sofaSprite(); }
+  if(it.type==='tv'){ tvSprite(); }
+  if(it.type==='plant'){ plantSprite(); }
+  if(it.type==='counter'){ counterSprite(); }
+  if(it.type==='fridge'){ fridgeSprite(); }
+  if(it.type==='shower'){ showerSprite(); }
+  if(it.type==='sink'){ sinkSprite(); }
+  if(it.type==='bed'){ bedSprite(); }
+  if(it.type==='dresser'){ dresserSprite(); }
+  cx.restore();
+}
+function sofaSprite(){ cx.fillStyle='#8a685a'; rectIso(0,0,1.6,0.8,0.6); }
+function tvSprite(){ cx.fillStyle='#1d2129'; rectIso(-0.2,-0.2,1.2,0.2,1.0); cx.fillStyle='#0b0f14'; rectIso(0,0,1.2,0.1,0.6); }
+function plantSprite(){ cx.fillStyle='#2a7a54'; rectIso(0,0,0.8,0.4,0.6); }
+function counterSprite(){ cx.fillStyle='#59606a'; rectIso(0,0,2.6,0.6,0.8); }
+function fridgeSprite(){ cx.fillStyle='#c8d0d8'; rectIso(0,0,0.9,0.7,1.2); }
+function showerSprite(){ cx.fillStyle='#3b5a6a'; rectIso(0,0,1.0,0.8,1.2); }
+function sinkSprite(){ cx.fillStyle='#8792a0'; rectIso(0,0,1.2,0.5,0.7); }
+function bedSprite(){ cx.fillStyle='#7a89c2'; rectIso(0,0,1.8,1.0,0.5); }
+function dresserSprite(){ cx.fillStyle='#734f38'; rectIso(0,0,1.0,0.6,1.0); }
+
+function rectIso(x,y,w,h,ht){
+  // draw an iso box centered on tile
+  const s=TILE/48;
+  const A=iso(x,y), B=iso(x+w,y), C=iso(x,y+h), D=iso(x+w,y+h);
+  // top
+  cx.beginPath(); cx.moveTo(A.x,A.y); cx.lineTo(B.x,B.y); cx.lineTo(D.x,D.y); cx.lineTo(C.x,C.y); cx.closePath(); cx.fill();
+  // sides
+  cx.fillStyle=tint(cx.fillStyle,-20);
+  cx.beginPath(); cx.moveTo(B.x,B.y); cx.lineTo(B.x,B.y+ht*TILE*0.5*s); cx.lineTo(D.x,D.y+ht*TILE*0.5*s); cx.lineTo(D.x,D.y); cx.closePath(); cx.fill();
+  cx.fillStyle=tint(cx.fillStyle,-15);
+  cx.beginPath(); cx.moveTo(A.x,A.y); cx.lineTo(A.x,A.y+ht*TILE*0.5*s); cx.lineTo(C.x,C.y+ht*TILE*0.5*s); cx.lineTo(C.x,C.y); cx.closePath(); cx.fill();
+}
+function tint(hex,amt){ // accept css like '#223344' or 'rgb...' but we use hex here
+  let c = cx.fillStyle; if(c[0]!=='#') return c;
+  const n = parseInt(c.slice(1),16);
+  let r=(n>>16)+amt, g=((n>>8)&255)+amt, b=(n&255)+amt;
+  r=clamp(r,0,255); g=clamp(g,0,255); b=clamp(b,0,255);
+  return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
 }
 
-// head + hair
-const head=new THREE.Mesh(new THREE.SphereGeometry(0.35,28,28), new THREE.MeshStandardMaterial({map:faceTex,roughness:.6}));
-head.position.y=2.45; head.castShadow=true; player.add(head);
-const hair=new THREE.Mesh(new THREE.SphereGeometry(0.37,28,28,0,Math.PI*2,0,Math.PI/1.8), new THREE.MeshStandardMaterial({color:A.hair,roughness:.7}));
-hair.position.copy(head.position); hair.position.y+=0.02; player.add(hair);
+/* ===== CHARACTER SPRITE (face, hair, outfits) ===== */
+function drawChar(x,y,flip=1,me=true,skin=A.skin,hair=A.hair,style=A.hairStyle,out=A.outfit){
+  const p=iso(x,y), s=R;
+  cx.save(); cx.translate(p.x, p.y); cx.scale(flip,1); // flip for facing
+  // shoes/outfit colors
+  const outfits={
+    casual:{top:'#a86dff',bottom:'#242833',shoe:'#e7ecf2'},
+    work:{top:'#2ec27e',bottom:'#1f2a22',shoe:'#f1f5f9'},
+    gym:{top:'#4fd1ff',bottom:'#14202a',shoe:'#c8f7ff'},
+    night:{top:'#ff6b9a',bottom:'#2a2e39',shoe:'#f5d36b'},
+    cozy:{top:'#8ad7a0',bottom:'#314b3c',shoe:'#eaeaea'}
+  };
+  const o=outfits[out]||outfits.casual;
 
-// face plate that always renders on top (so you always see features)
-const facePlate = new THREE.Mesh(
-  new THREE.PlaneGeometry(0.62,0.62),
-  new THREE.MeshBasicMaterial({map:faceTex,transparent:true,depthTest:false,depthWrite:false})
-);
-facePlate.renderOrder = 999;
-facePlate.position.set(0,2.45,0.45);
-player.add(facePlate);
-
-/* drawing the face with sliders */
-function drawFace(){
-  const c = faceCan.getContext('2d');
-  c.clearRect(0,0,256,256);
-  c.save(); c.beginPath(); c.arc(128,128,112,0,Math.PI*2); c.clip();
-  c.fillStyle = A.skin; c.fillRect(0,0,256,256);
-  c.fillStyle = A.hair;
-  if(A.hairStyle==='bun'){ c.beginPath(); c.arc(128,44,26,0,Math.PI*2); c.fill(); c.fillRect(64,58,128,22); }
-  else if(A.hairStyle==='curls'){ for(let i=0;i<20;i++){ const x=40+i*9, y=58+Math.sin(i)*2; c.beginPath(); c.arc(x,y,10,0,Math.PI*2); c.fill(); } }
-  else if(A.hairStyle==='braids'){ for(let i=0;i<8;i++){ c.fillRect(80+i*8,58,4,28); } }
-  else { c.fillRect(70,58,116,20); }
-  const es = 10*CC.eyeSize, gap = 10 + CC.eyeGap;
-  c.fillStyle="#fff";
-  c.fillRect(128-gap-(es+6)/2,108, es+6, es);
-  c.fillRect(128+gap-(es+6)/2,108, es+6, es);
-  c.fillStyle="#111";
-  c.fillRect(128-gap-es/2,110, es*0.6, es*0.6);
-  c.fillRect(128+gap-es/2,110, es*0.6, es*0.6);
-  c.fillStyle="#00000033";
-  const noseL = 12*CC.nose; c.beginPath(); c.moveTo(128,128); c.lineTo(124,128+noseL); c.lineTo(132,128+noseL); c.closePath(); c.fill();
-  const mw = 28*CC.mouth; c.fillStyle="#b66"; c.fillRect(128-mw/2,160, mw, 6);
-  c.restore(); faceTex.needsUpdate=true;
+  // feet
+  cx.fillStyle=o.shoe; ellipse(0, HALF*0.9, 16*s,10*s); ellipse(20*s, HALF*0.9, 16*s,10*s);
+  // legs
+  cx.fillStyle=o.bottom; roundRect(2*s, HALF*0.4, 16*s, 26*s, 8*s);
+  roundRect(22*s, HALF*0.4, 16*s, 26*s, 8*s);
+  // torso
+  cx.fillStyle=o.top; roundRect(0, 0, 38*s, 44*s, 14*s);
+  // arms
+  roundRect(-10*s, 6*s, 12*s, 28*s, 6*s);
+  roundRect(36*s, 6*s, 12*s, 28*s, 6*s);
+  // head
+  cx.fillStyle=skin; circle(19*s, -10*s, 16*s);
+  // hair
+  cx.fillStyle=hair;
+  if(style==='bun'){ circle(19*s,-24*s, 10*s); roundRect(6*s,-16*s,26*s,10*s,6*s); }
+  else if(style==='curls'){ for(let i=0;i<6;i++){ circle(6*s+i*6*s,-18*s+ (i%2?2:-2)*s, 5*s); } roundRect(6*s,-14*s,26*s,8*s,4*s); }
+  else if(style==='braids'){ for(let i=0;i<5;i++){ roundRect(8*s+i*5*s,-14*s,3*s,14*s,2*s);} }
+  else { roundRect(6*s,-14*s,26*s,10*s,6*s); }
+  // face
+  cx.fillStyle='#fff'; roundRect(10*s,-4*s, 8*s,4*s,2*s); roundRect(20*s,-4*s, 8*s,4*s,2*s);
+  cx.fillStyle='#111'; roundRect(13*s,-3*s, 3*s,3*s,1*s); roundRect(23*s,-3*s, 3*s,3*s,1*s);
+  cx.fillStyle='#b66'; roundRect(14*s,6*s, 10*s,3*s,2*s);
+  cx.restore();
 }
+function circle(x,y,r){cx.beginPath();cx.arc(x,y,r,0,Math.PI*2);cx.fill();}
+function ellipse(x,y,w,h){cx.beginPath(); for(let i=0;i<2;i++){ } cx.save();cx.translate(x,y);cx.scale(w/2,h/2);cx.beginPath();cx.arc(0,0,1,0,Math.PI*2);cx.restore();cx.fill();}
+function roundRect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();cx.fill();}
 
-/* outfit + creator application */
-function applyOutfit(){
-  const o=OUTFITS[A.outfit];
-  $('outfitName').textContent=o.name;
-  torso.material.color.setHex(o.top);
-  armL.material.color.setHex(o.top); armR.material.color.setHex(o.top); shoulderL.material.color.setHex(o.top); shoulderR.material.color.setHex(o.top);
-  legL.material.color.setHex(o.bottom); legR.material.color.setHex(o.bottom);
-  buildShoes(o.shoe);
-}
-function applyCreator(){
-  // overall height + head size
-  player.scale.set(1, CC.height, 1);
-  head.scale.set(CC.head,CC.head,CC.head);
-  // subtle waist/hip shaping for curvy vs athletic
-  const hip = (A.body==='curvy'?1.12:(A.body==='athletic'?1.03:1.0));
-  const waist = (A.body==='curvy'?0.94:(A.body==='athletic'?0.98:1.0));
-  torso.scale.set(hip,1,hip);
-  torso.scale.x*=waist; torso.scale.z*=waist; // taper a bit
-  drawFace();
-}
-
-/* NPCs */
-const npcs=new THREE.Group(); scene.add(npcs);
-function spawnNpc(){
-  if(S.npcs.length>=3) return;
-  const g=new THREE.Group();
-  const b=new THREE.Mesh(new THREE.CapsuleGeometry(0.4,1.0,8,16),new THREE.MeshStandardMaterial({color:0x4fd1ff})); b.position.y=1.4; g.add(b);
-  const h=new THREE.Mesh(new THREE.SphereGeometry(0.32,20,20),new THREE.MeshStandardMaterial({color:0xc99b75})); h.position.y=2.1; g.add(h);
-  g.position.set((Math.random()<.5?-1:1)*5,0,(Math.random()<.5?-1:1)*2); g.userData={vx:(Math.random()<.5?-1:1)*0.6,name:randName(),rel:10+rand(15),status:'acquaintance'};
-  npcs.add(g); S.npcs.push({id:cryptoRandom(),name:g.userData.name,rel:g.userData.rel,status:'acquaintance',obj:g});
-}
-function moveNpcs(dt){ npcs.children.forEach(n=>{ n.position.x+=n.userData.vx*dt; if(n.position.x<-8||n.position.x>8) n.userData.vx*=-1; }); }
-function renderNpcList(){
-  $('npcList').innerHTML=S.npcs.map(n=>`<div class="card" data-id="${n.id}"><div><div class="name">${n.name}</div><div class="meta">${n.status}</div></div><div class="meta">Rel ${n.rel}</div></div>`).join('');
-  $$('#npcList .card').forEach(el=>el.addEventListener('click',()=>{ const n=S.npcs.find(x=>x.id===el.dataset.id); S.sel=n; $('npcActions').style.display='flex'; $('npcName').textContent=`${n.name} • Rel ${n.rel}`; }));
-}
-
-/* Room switching */
-function resetView(){ player.position.set(0,0,0); camera.position.set(0,5.8,9.5); camera.lookAt(0,1.2,0); target=null; }
-function switchRoom(name,tele){ if(!floors[name]) return; Object.values(floors).forEach(m=>scene.remove(m)); scene.add(floors[name]); S.room=name; room.clear(); room.add(furnFor(name)); drawDoors(name); if(tele) resetView(); }
-
-/* Tap to move / interact */
-const ray=new THREE.Raycaster(); let target=null;
-$('webgl').addEventListener('pointerdown',e=>{
-  const r=$('webgl').getBoundingClientRect(); const x=(e.clientX-r.left)/r.width*2-1, y=-((e.clientY-r.top)/r.height*2-1);
-  const m=new THREE.Vector2(x,y); ray.setFromCamera(m,camera);
-  const d=ray.intersectObjects(doorGroup.children,true)[0]; if(d && d.object.userData.to){ switchRoom(d.object.userData.to,true); return; }
-  const f=ray.intersectObjects(room.children,true)[0];
-  if(f && f.object.userData.type){ target=f.point.clone(); target.userData=f.object.userData.type; return; }
-  const floorHit=ray.intersectObject(floors[S.room],true)[0]; if(floorHit){ target=floorHit.point.clone(); target.userData=null; }
+/* ===== INPUT ===== */
+cv.addEventListener('pointerdown',e=>{
+  const rect=cv.getBoundingClientRect(); const mx=(e.clientX-rect.left)*R, my=(e.clientY-rect.top)*R;
+  // find clicked tile by bruteforce search (grid is small)
+  const Rm=ROOMS[S.room]; let best=null,dmin=1e9;
+  for(let y=0;y<Rm.h;y++)for(let x=0;x<Rm.w;x++){
+    const p=iso(x,y); const d=(p.x-mx)**2+(p.y-my)**2; if(d<dmin){dmin=d; best={x,y};}
+  }
+  if(best){ P.tx=best.x; P.ty=best.y; }
 },{passive:true});
 
-/* Loop */
+/* ===== LOOP ===== */
 let last=performance.now();
 function tick(now){
   const dt=Math.min(50,now-last)/1000; last=now;
-  // needs/time
+  // time & needs decay
   S.t += S.speed*dt; const s=S.speed/2; S.hunger=clamp(S.hunger+0.25*s*dt,0,100); S.energy=clamp(S.energy-0.18*s*dt,0,100); S.clean=clamp(S.clean-0.10*s*dt,0,100); S.fun=clamp(S.fun-0.08*s*dt,0,100);
-  const day=Math.floor(S.t/(24*60)); if(day!==S.lastNpcDay){S.lastNpcDay=day; spawnNpc(); renderNpcList();}
-  moveNpcs(60*dt);
+  const day=Math.floor(S.t/(24*60)); if(day!==S.lastNpcDay){S.lastNpcDay=day; spawnNpc();}
+  // npc move
+  NPCS.forEach(n=>{ n.x+=n.vx*dt; if(n.x<1||n.x>ROOMS[S.room].w-2) n.vx*=-1; });
+
   // move player
-  if(target){
-    const p=new THREE.Vector3(player.position.x,0,player.position.z), to=target.clone().setY(0), dir=to.clone().sub(p), L=dir.length();
-    if(L>0.05){ dir.normalize(); player.position.add(dir.multiplyScalar(2.2*dt)); player.lookAt(to.x,player.position.y,to.z); }
-    else { if(target.userData){ doInteract(target.userData); } target=null; }
+  if(P.tx!=null){
+    const dx=P.tx-P.x, dy=P.ty-P.y, L=Math.hypot(dx,dy);
+    if(L>0.02){ P.x+=dx*dt*1.8; P.y+=dy*dt*1.8; P.flip=dx<0?-1:1; }
+    else { P.x=P.tx; P.y=P.ty; interactHere(); P.tx=P.ty=null; }
   }
-  // keep face readable
-  facePlate.lookAt(camera.position);
-  followCam();
+
+  // draw
+  cx.clearRect(0,0,cv.width,cv.height);
+  drawRoom();
+  ROOMS[S.room].items.forEach(drawItem);
+  // doors
+  (DOORS[S.room]||[]).forEach(([to,x,y])=>{
+    const p=iso(x,y); cx.fillStyle='#0f172a'; roundRect(p.x-10*R,p.y+6*R,20*R,10*R,4*R);
+  });
+  // npcs then player (by y for depth)
+  const sprites=[...NPCS.map(n=>({y:n.y,fn:()=>drawChar(n.x,n.y, n.vx<0?-1:1,false, '#c99b75','#333','short','work')})), {y:P.y,fn:()=>drawChar(P.x,P.y,P.flip,true)}];
+  sprites.sort((a,b)=>a.y-b.y).forEach(s=>s.fn());
+
   setBars();
-  R.render(scene,camera);
   requestAnimationFrame(tick);
 }
-function followCam(){ const target=new THREE.Vector3(player.position.x,1.2,player.position.z); const pos=new THREE.Vector3(player.position.x,5.8,player.position.z+7.5); camera.position.lerp(pos,0.08); camera.lookAt(target); }
+requestAnimationFrame(tick);
 
-/* Interactions */
-function doInteract(type){ if(type==='sleep'){sleep();toast('You slept');} if(type==='shower'){shower();toast('Shower done');} if(type==='eat'){eat();toast('Ate a meal');} if(type==='tv'){tv();toast('Watched TV');} }
+/* ===== INTERACTIONS ===== */
+function interactHere(){
+  const it = ROOMS[S.room].items.find(i=>i.x===Math.round(P.x)&&i.y===Math.round(P.y));
+  if(!it) return;
+  if(it.type==='bed'){ sleep(); toast('You slept'); }
+  if(it.type==='shower'){ shower(); toast('Shower done'); }
+  if(it.type==='counter' || it.type==='fridge' || S.room==='kitchen'){ eat(); toast('Ate a meal'); }
+  if(it.type==='tv' || it.type==='sofa'){ tv(); toast('Watched TV'); }
+}
+
+/* ===== ACTIONS ===== */
 function eat(){ if(S.money<8) return toast('Need $8'); S.money-=8; S.hunger=clamp(S.hunger-35,0,100); S.energy=clamp(S.energy+5,0,100); timePass(20); }
 function sleep(){ let m=0; while(S.energy<95&&m<8*60){ S.energy=clamp(S.energy+1.2,0,100); S.hunger=clamp(S.hunger+0.4,0,100); m+=10;} timePass(m); }
 function shower(){ S.clean=clamp(S.clean+35,0,100); S.energy=clamp(S.energy+2,0,100); timePass(15); }
 function tv(){ S.fun=clamp(S.fun+28,0,100); S.energy=clamp(S.energy-6,0,100); timePass(40); }
 function study(){ if(S.energy<20) return toast('Too tired'); S.edu=clamp(S.edu+6+rand(4),0,100); S.energy=clamp(S.energy-10,0,100); S.fun=clamp(S.fun-4,0,100); timePass(50); }
-function work(){ if(!S.job) return toast('No job yet'); const j=JOBS[S.job], h=hour(S.t), [o,c]=j.open, open = o<c ? (h>=o&&h<c) : (h>=o||h<c);
+function work(){
+  if(!S.job) return toast('No job yet');
+  const j=JOBS[S.job], h=hour(S.t), [o,c]=j.open, open=o<c?(h>=o&&h<c):(h>=o||h<c);
   if(!open) return toast('Job closed now');
-  const hrs=2+rand(2), pay=j.pay*hrs + (S.job==='stripper'?rand(80):0), perf=(S.energy>40?1:0.7)*(S.clean>40?1:0.8);
-  S.money+=Math.floor(pay*perf); S.energy=clamp(S.energy-12*hrs/2,0,100); S.hunger=clamp(S.hunger+10*hrs/2,0,100); S.fun=clamp(S.fun+(S.job==='stripper'?4:-4),0,100); S.clean=clamp(S.clean-6*hrs/2,0,100);
-  timePass(hrs*60); toast(`Worked ${hrs}h, earned $${Math.floor(pay*perf)}`);}
+  const hrs=2+rand(2), pay=j.pay*hrs + (S.job==='stripper'?rand(80):0);
+  const perf=(S.energy>40?1:0.7)*(S.clean>40?1:0.8);
+  S.money+=Math.floor(pay*perf);
+  S.energy=clamp(S.energy-12*hrs/2,0,100); S.hunger=clamp(S.hunger+10*hrs/2,0,100); S.fun=clamp(S.fun+(S.job==='stripper'?4:-4),0,100); S.clean=clamp(S.clean-6*hrs/2,0,100);
+  timePass(hrs*60); toast(`Worked ${hrs}h, earned $${Math.floor(pay*perf)}`);
+}
 function clean(){ S.clean=clamp(S.clean+28,0,100); S.energy=clamp(S.energy-5,0,100); timePass(30); }
-function save(){ localStorage.setItem('cozy3d_creator2',JSON.stringify({S,A,CC})); toast('Saved'); }
-function load(){ const raw=localStorage.getItem('cozy3d_creator2'); if(!raw) return toast('No save'); try{ const d=JSON.parse(raw); Object.assign(S,d.S||{}); Object.assign(A,d.A||{}); Object.assign(CC,d.CC||{}); 
-  // reflect sliders + visuals
-  ccHeight.value=CC.height; ccHead.value=CC.head; ccEyeSize.value=CC.eyeSize; ccEyeGap.value=CC.eyeGap; ccNose.value=CC.nose; ccMouth.value=CC.mouth;
-  $('skin').value=A.skin; $('hairStyle').value=A.hairStyle; $('hairColor').value=A.hair;
-  hair.material.color.set(A.hair);
-  applyOutfit(); applyCreator(); drawFace(); setBars(); $('job').textContent=S.job?JOBS[S.job].name:'Unemployed'; switchRoom(S.room,true); toast('Loaded'); }catch{ toast('Load failed'); }}
+function save(){ localStorage.setItem('cozy_iso',JSON.stringify({S,A})); toast('Saved'); }
+function load(){ const raw=localStorage.getItem('cozy_iso'); if(!raw) return toast('No save'); try{ const d=JSON.parse(raw); Object.assign(S,d.S||{}); Object.assign(A,d.A||{}); setBars(); $('job').textContent=S.job?JOBS[S.job].name:'Unemployed'; $('skin').value=A.skin; $('hairStyle').value=A.hairStyle; $('hairColor').value=A.hair; $('outfit').value=A.outfit; toast('Loaded'); }catch{ toast('Load failed'); }}
+
+/* ===== HELPERS ===== */
 function setBars(){ $('bEnergy').style.width=S.energy+'%'; $('bHunger').style.width=(100-S.hunger)+'%'; $('bFun').style.width=S.fun+'%'; $('bClean').style.width=S.clean+'%'; $('bEdu').style.width=S.edu+'%'; $('bRep').style.width=S.rep+'%'; $('money').textContent=Math.floor(S.money); $('clock').textContent=timeFmt(S.t); $('job').textContent=S.job?JOBS[S.job].name:'Unemployed'; }
-function bump(k,v){ S[k]=clamp(S[k]+v,0,100); }
 function timePass(m){ S.t+=m; }
+function hour(t){return Math.floor((t/60)%24);}
+function timeFmt(m){const h=hour(m),mi=Math.floor(m%60),ap=h>=12?'PM':'AM',hh=((h+11)%12+1);return `${hh}:${String(mi).padStart(2,'0')} ${ap}`;}
 function fmtHours([o,c]){ const f=h=>h===0?'12a':(h<12?`${h}a`:(h===12?'12p':`${h-12}p`)); return `${f(o)}–${f(c)}` }
 function randName(){const a=['Alex','Jordan','Taylor','Riley','Casey','Avery','Kai','Skye','Nina','Malik','Jada','Imani','Noah']; return a[rand(a.length)]+' '+(Math.random()<0.5?'B.':'C.');}
-function cryptoRandom(){return Math.random().toString(36).slice(2); }
+function toast(msg,ms=1200){const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._h); toast._h=setTimeout(()=>t.hidden=true,ms);}
 
-/* Boot */
-function boot(){ switchRoom('living',true); applyOutfit(); applyCreator(); drawFace(); spawnNpc(); renderNpcList(); setBars(); requestAnimationFrame(tick); }
-boot();
-})();</script>
+/* ===== NPC UI ===== */
+function renderNpcList(){
+  $('npcList').innerHTML=S.npcs.map(n=>`<div class="card" data-id="${n.id}"><div><div class="name">${n.name}</div><div class="meta">acquaintance</div></div><div class="meta">Rel ${n.rel}</div></div>`).join('');
+  $$('#npcList .card').forEach(el=>el.addEventListener('click',()=>{ const n=S.npcs.find(x=>x.id===el.dataset.id); S.sel=n; $('npcActions').style.display='flex'; $('npcName').textContent=`${n.name} • Rel ${n.rel}`; }));
+}
+$('p-relationships').addEventListener('click',e=>{
+  const k=e.target.getAttribute('data-npc'); if(!k) return; const n=S.sel; if(!n) return toast('Pick someone first');
+  if(k==='chat'){ S.fun=clamp(S.fun+8,0,100); n.rel+=5+rand(5); timePass(20); toast('Chatted'); }
+  if(k==='compliment'){ const g=Math.random()<.8?(6+rand(6)):0; n.rel+=g; timePass(10); toast(g?'They smiled':'Awkward…'); }
+  if(k==='gift'){ if(S.money<25) return toast('Need $25'); S.money-=25; n.rel+=10+rand(10); timePass(10); toast('They loved it'); }
+  if(k==='date'){ if(S.money<40) return toast('Need $40'); S.money-=40; S.fun=clamp(S.fun+18,0,100); S.clean=clamp(S.clean-6,0,100); S.energy=clamp(S.energy-8,0,100); n.rel+=12+rand(10); timePass(120); toast('Cute date ❤️'); }
+  renderNpcList(); setBars();
+});
+
+/* boot */
+S.npcs=[{id:cryptoRandom(),name:randName(),rel:12},{id:cryptoRandom(),name:randName(),rel:20}]; renderNpcList(); requestAnimationFrame(tick);
+
+/* utils */
+function cryptoRandom(){return Math.random().toString(36).slice(2);}
+})(); 
+</script>
 </body>
 </html>
