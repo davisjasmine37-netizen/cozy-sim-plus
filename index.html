@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<title>Cozy Life 3D — Playable</title>
+<title>Cozy Life 3D — Creator</title>
 <style>
   *{box-sizing:border-box}html,body{height:100%;margin:0}
   body{background:#0e141b;color:#e7ecf2;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;overflow:hidden}
@@ -30,6 +30,9 @@
   #toast{position:fixed;left:50%;top:22%;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:10px 14px;border-radius:10px;backdrop-filter:blur(8px);z-index:99}
   #centerCam{position:fixed;left:10px;bottom:140px;z-index:8;border:0;border-radius:10px;background:#1a2330;color:#e7ecf2;padding:8px 10px}
   canvas{position:fixed;inset:0}
+  /* simple inputs */
+  #p-me label{display:flex;flex-direction:column;gap:6px;font-size:14px}
+  #p-me input[type=range], #p-me select{width:100%;padding:8px;border:0;border-radius:10px;background:#17212c;color:#e7ecf2}
 </style>
 </head>
 <body>
@@ -77,7 +80,7 @@
     <button data-act="clean">Clean 🧹</button>
     <button data-act="save">Save 💾</button>
   </div>
-  <div class="meta">Tip: **Tap the floor** to walk there. **Tap a sofa/bed/shower/counter** to auto-walk and do it.</div>
+  <div class="meta">Tip: **Tap the floor** to walk. **Tap sofa/bed/shower/counter** to auto‑walk and do it.</div>
 </section>
 
 <!-- jobs -->
@@ -99,33 +102,49 @@
   </div>
 </section>
 
-<!-- me -->
+<!-- ME: simple character creator -->
 <section id="p-me" class="panel">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-    <label>Skin tone <select id="skin">
-      <option value="#2c1f16" selected>Deep brown</option>
-      <option value="#3b2a1d">Warm brown</option>
-      <option value="#5a3b2b">Brown</option>
-      <option value="#7a543e">Tan</option>
-      <option value="#a1765c">Light tan</option>
-    </select></label>
-    <label>Body type <select id="body">
-      <option value="slim" selected>Slim</option>
-      <option value="curvy">Curvy</option>
-      <option value="athletic">Athletic</option>
-    </select></label>
-    <label>Hair style <select id="hairStyle">
-      <option value="curls" selected>Curls</option>
-      <option value="bun">Bun</option>
-      <option value="braids">Braids</option>
-      <option value="short">Short</option>
-    </select></label>
-    <label>Hair color <select id="hairColor">
-      <option value="#0c0b0c" selected>Black</option>
-      <option value="#2b1d12">Dark brown</option>
-      <option value="#4a2c1a">Brown</option>
-      <option value="#2b2b2b">Gray</option>
-    </select></label>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <label>Skin tone
+      <select id="skin">
+        <option value="#2c1f16" selected>Deep brown</option>
+        <option value="#3b2a1d">Warm brown</option>
+        <option value="#5a3b2b">Brown</option>
+        <option value="#7a543e">Tan</option>
+        <option value="#a1765c">Light tan</option>
+      </select>
+    </label>
+    <label>Hair style
+      <select id="hairStyle">
+        <option value="curls" selected>Curls</option>
+        <option value="bun">Bun</option>
+        <option value="braids">Braids</option>
+        <option value="short">Short</option>
+      </select>
+    </label>
+    <label>Hair color
+      <select id="hairColor">
+        <option value="#0c0b0c" selected>Black</option>
+        <option value="#2b1d12">Dark brown</option>
+        <option value="#4a2c1a">Brown</option>
+        <option value="#2b2b2b">Gray</option>
+      </select>
+    </label>
+
+    <div style="grid-column:1 / span 2;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#121a24;border-radius:10px;padding:10px">
+      <div style="font-weight:700;opacity:.9">Simple Character Creator</div><div></div>
+      <label>Height <input id="ccHeight" type="range" min="0.9" max="1.2" step="0.01" value="1.00"></label>
+      <label>Head size <input id="ccHead" type="range" min="0.8" max="1.3" step="0.01" value="1.00"></label>
+      <label>Eye size <input id="ccEyeSize" type="range" min="0.6" max="1.4" step="0.02" value="1.00"></label>
+      <label>Eye gap <input id="ccEyeGap" type="range" min="-8" max="8" step="1" value="0"></label>
+      <label>Nose length <input id="ccNose" type="range" min="0.8" max="1.4" step="0.02" value="1.00"></label>
+      <label>Mouth width <input id="ccMouth" type="range" min="0.6" max="1.6" step="0.02" value="1.00"></label>
+      <div style="grid-column:1 / span 2;display:flex;gap:8px">
+        <button id="ccRandom">Randomize</button>
+        <button id="ccSave">Save Look</button>
+      </div>
+    </div>
+
     <div style="grid-column:1 / span 2;display:flex;gap:8px;align-items:center">
       <span class="badge">Outfit</span><button id="outfit">Change</button>
       <span class="badge">Time</span><input id="time" type="range" min="0.5" max="6" step="0.5" value="2" style="width:160px"><span id="tLbl" class="badge">2 min/sec</span>
@@ -145,14 +164,18 @@
 
 <script>
 (()=>{ // ===== GAME =====
+/* ---------- helpers ---------- */
 const $=id=>document.getElementById(id), $$=s=>Array.from(document.querySelectorAll(s));
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const hour=t=>Math.floor((t/60)%24);
 const timeFmt=m=>{const h=hour(m),mi=Math.floor(m%60),ap=h>=12?'PM':'AM',hh=((h+11)%12+1);return `${hh}:${String(mi).padStart(2,'0')} ${ap}`;}
 const OUTFITS=[{top:0xa86dff,bottom:0x22252d,shoes:0xe7ecf2,name:'Casual'},{top:0x2ec27e,bottom:0x1f2a22,shoes:0xe8ecf1,name:'Work'},{top:0x4fd1ff,bottom:0x14202a,shoes:0xc8f7ff,name:'Gym'},{top:0xff6b9a,bottom:0x2a2e39,shoes:0xf5d36b,name:'Night Out'}];
+function toast(msg,ms=1200){const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._h); toast._h=setTimeout(()=>t.hidden=true,ms);}
 
+/* ---------- state ---------- */
 const S={room:'living',t:7*60,speed:2,energy:70,hunger:30,fun:40,clean:60,edu:10,rep:10,money:120,job:null,npcs:[],sel:null,lastNpcDay:-1};
 const A={skin:'#2c1f16',hair:'#0c0b0c',hairStyle:'curls',body:'slim',outfit:0};
+const CC={height:1.00,head:1.00,eyeSize:1.00,eyeGap:0,nose:1.00,mouth:1.00}; // creator sliders
 const JOBS={barista:{name:'Barista',open:[6,14],pay:16,req:0},stripper:{name:'Performer (Club)',open:[19,2],pay:28,req:0,audition:true},lawyer:{name:'Junior Lawyer',open:[9,19],pay:55,req:70},doctor:{name:'Resident Doctor',open:[7,19],pay:60,req:85}};
 const rand=n=>Math.floor(Math.random()*n);
 
@@ -168,23 +191,50 @@ $('p-jobs').addEventListener('click',e=>{
 $('tabs').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; $$('#tabs button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); $$('.panel').forEach(p=>p.classList.remove('active')); $('p-'+b.dataset.tab).classList.add('active');});
 $('rooms').addEventListener('click',e=>{const r=e.target.getAttribute('data-room'); if(!r)return; switchRoom(r,true);});
 $('acts').addEventListener('click',e=>{const k=e.target.getAttribute('data-act'); if(!k) return; ({eat, sleep, shower, tv, study, work, clean, save})[k](); setBars();});
-
 $('outfit').addEventListener('click',()=>{A.outfit=(A.outfit+1)%OUTFITS.length; applyOutfit(); toast('Outfit: '+OUTFITS[A.outfit].name);});
 $('skin').addEventListener('change',e=>{A.skin=e.target.value; drawFace();});
 $('hairStyle').addEventListener('change',e=>{A.hairStyle=e.target.value; drawFace();});
 $('hairColor').addEventListener('change',e=>{A.hair=e.target.value; drawFace();});
-$('body').addEventListener('change',e=>{A.body=e.target.value; applyBody();});
-const tSlider=$('time'); const tLbl=$('tLbl'); tSlider.value=S.speed; tLbl.textContent=S.speed+' min/sec'; tSlider.addEventListener('input',()=>{S.speed=parseFloat(tSlider.value); tLbl.textContent=S.speed+' min/sec';});
-$('load').addEventListener('click',load); $('reset').addEventListener('click',()=>{localStorage.removeItem('cozy3d_play');location.reload();});
+const tSlider=$('time'), tLbl=$('tLbl'); tSlider.value=S.speed; tLbl.textContent=S.speed+' min/sec';
+tSlider.addEventListener('input',()=>{S.speed=parseFloat(tSlider.value); tLbl.textContent=S.speed+' min/sec';});
+$('load').addEventListener('click',load); $('reset').addEventListener('click',()=>{localStorage.removeItem('cozy3d_creator');location.reload();});
 $('centerCam').addEventListener('click',resetView);
 
+/* creator inputs */
+['ccHeight','ccHead','ccEyeSize','ccEyeGap','ccNose','ccMouth'].forEach(id=>{
+  const el=$(id); el.addEventListener('input', ()=>{
+    CC.height = parseFloat($('ccHeight').value);
+    CC.head   = parseFloat($('ccHead').value);
+    CC.eyeSize= parseFloat($('ccEyeSize').value);
+    CC.eyeGap = parseFloat($('ccEyeGap').value);
+    CC.nose   = parseFloat($('ccNose').value);
+    CC.mouth  = parseFloat($('ccMouth').value);
+    applyCreator();
+  });
+});
+$('ccRandom').addEventListener('click', ()=>{
+  const r=(a,b)=> (Math.random()*(b-a)+a);
+  CC.height = +(r(0.92,1.18)).toFixed(2);
+  CC.head   = +(r(0.85,1.25)).toFixed(2);
+  CC.eyeSize= +(r(0.70,1.30)).toFixed(2);
+  CC.eyeGap = Math.round(r(-6,6));
+  CC.nose   = +(r(0.90,1.30)).toFixed(2);
+  CC.mouth  = +(r(0.80,1.40)).toFixed(2);
+  ccHeight.value=CC.height; ccHead.value=CC.head; ccEyeSize.value=CC.eyeSize; ccEyeGap.value=CC.eyeGap; ccNose.value=CC.nose; ccMouth.value=CC.mouth;
+  applyCreator();
+});
+$('ccSave').addEventListener('click', ()=>{
+  const saved = JSON.parse(localStorage.getItem('cozy3d_creator')||'{}');
+  localStorage.setItem('cozy3d_creator', JSON.stringify({ ...(saved||{}), S, A, CC }));
+  toast('Look saved');
+});
+
 /* ---------- 3D ---------- */
-const R=new THREE.WebGLRenderer({canvas:$('webgl'),antialias:true}); R.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+const R=new THREE.WebGLRenderer({canvas:$('webgl'),antialias:true}); R.setPixelRatio(Math.min(2,devicePixelRatio||1));
 const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0a1016);
 const camera=new THREE.PerspectiveCamera(55,1,0.1,100); camera.position.set(0,6,10);
 const hemi=new THREE.HemisphereLight(0xffffff,0x223344,1.35); scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xffffff,0.9); sun.position.set(2,8,5); sun.castShadow=true; scene.add(sun);
-
 function onResize(){const w=innerWidth,h=innerHeight; R.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix();}
 addEventListener('resize',onResize,{passive:true}); onResize();
 
@@ -218,7 +268,7 @@ const DOORS={living:[{x:-9,z:0,to:'kitchen'},{x:9,z:0,to:'bathroom'}],
              bedroom:[{x:9,z:0,to:'kitchen'}]};
 function drawDoors(r){ doorGroup.clear(); (DOORS[r]||[]).forEach(d=>{const m=box(0.8,2.2,0.2,0x1a2330); m.position.set(d.x,1.1,d.z); m.userData.to=d.to; doorGroup.add(m);}); }
 
-/* Player */
+/* Player (simple rig + face plate) */
 const player=new THREE.Group(); scene.add(player);
 const faceCan=document.createElement('canvas'); faceCan.width=256; faceCan.height=256; const faceTex=new THREE.CanvasTexture(faceCan);
 const torso=new THREE.Mesh(new THREE.CapsuleGeometry(0.45,1.2,8,16), new THREE.MeshStandardMaterial({color:OUTFITS[A.outfit].top})); torso.position.y=1.6; torso.castShadow=true; player.add(torso);
@@ -226,23 +276,45 @@ const legL=new THREE.Mesh(new THREE.CapsuleGeometry(0.2,0.6,6,12), new THREE.Mes
 const legR=legL.clone(); legR.position.x=0.2; player.add(legR);
 const head=new THREE.Mesh(new THREE.SphereGeometry(0.35,24,24), new THREE.MeshStandardMaterial({map:faceTex})); head.position.y=2.4; player.add(head);
 const hair=new THREE.Mesh(new THREE.SphereGeometry(0.37,24,24,0,Math.PI*2,0,Math.PI/1.8), new THREE.MeshStandardMaterial({color:A.hair})); hair.position.copy(head.position); hair.position.y+=0.02; player.add(hair);
+// flat face plate so the face is always readable
+const facePlate = new THREE.Mesh(new THREE.PlaneGeometry(0.58,0.58), new THREE.MeshBasicMaterial({map:faceTex,transparent:true}));
+facePlate.position.set(0,2.4,0.34); player.add(facePlate);
+
 function drawFace(){
-  const c=faceCan.getContext('2d'); c.clearRect(0,0,256,256);
-  c.fillStyle=A.skin; c.fillRect(0,0,256,256);
-  c.fillStyle=A.hair;
-  if(A.hairStyle==='bun'){c.beginPath();c.arc(128,44,26,0,Math.PI*2);c.fill();c.fillRect(64,58,128,22);}
-  else if(A.hairStyle==='curls'){for(let i=0;i<20;i++){const x=40+i*9,y=58+Math.sin(i)*2;c.beginPath();c.arc(x,y,10,0,Math.PI*2);c.fill();}}
-  else if(A.hairStyle==='braids'){for(let i=0;i<8;i++){c.fillRect(80+i*8,58,4,28);}}
-  else {c.fillRect(70,58,116,20);}
-  c.fillStyle="#fff"; c.fillRect(88,108,28,10); c.fillRect(140,108,28,10);
-  c.fillStyle="#111"; c.fillRect(98,110,8,8); c.fillRect(150,110,8,8);
-  c.fillStyle="#00000033"; c.beginPath(); c.moveTo(128,128); c.lineTo(122,143); c.lineTo(134,143); c.closePath(); c.fill();
-  c.fillStyle="#b66"; c.fillRect(114,160,28,6);
+  const c = faceCan.getContext('2d');
+  c.clearRect(0,0,256,256);
+  // circular mask
+  c.save(); c.beginPath(); c.arc(128,128,112,0,Math.PI*2); c.clip();
+  // skin
+  c.fillStyle = A.skin; c.fillRect(0,0,256,256);
+  // hair front/bangs
+  c.fillStyle = A.hair;
+  if(A.hairStyle==='bun'){ c.beginPath(); c.arc(128,44,26,0,Math.PI*2); c.fill(); c.fillRect(64,58,128,22); }
+  else if(A.hairStyle==='curls'){ for(let i=0;i<20;i++){ const x=40+i*9, y=58+Math.sin(i)*2; c.beginPath(); c.arc(x,y,10,0,Math.PI*2); c.fill(); } }
+  else if(A.hairStyle==='braids'){ for(let i=0;i<8;i++){ c.fillRect(80+i*8,58,4,28); } }
+  else { c.fillRect(70,58,116,20); }
+  // eyes with sliders
+  const es = 10*CC.eyeSize, gap = 10 + CC.eyeGap;
+  c.fillStyle="#fff";
+  c.fillRect(128-gap-(es+6)/2,108, es+6, es);
+  c.fillRect(128+gap-(es+6)/2,108, es+6, es);
+  c.fillStyle="#111";
+  c.fillRect(128-gap-es/2,110, es*0.6, es*0.6);
+  c.fillRect(128+gap-es/2,110, es*0.6, es*0.6);
+  // nose
+  c.fillStyle="#00000033";
+  const noseL = 12*CC.nose;
+  c.beginPath(); c.moveTo(128,128); c.lineTo(124,128+noseL); c.lineTo(132,128+noseL); c.closePath(); c.fill();
+  // mouth
+  const mw = 28*CC.mouth;
+  c.fillStyle="#b66"; c.fillRect(128-mw/2,160, mw, 6);
+  c.restore();
   faceTex.needsUpdate=true;
 }
 function applyOutfit(){ torso.material.color.setHex(OUTFITS[A.outfit].top); legL.material.color.setHex(OUTFITS[A.outfit].bottom); legR.material.color.setHex(OUTFITS[A.outfit].bottom); }
-function applyBody(){ const s=(A.body==='slim')?1:(A.body==='curvy'?1.12:1.08); torso.scale.set(1.02*s,1*s,1.02*s); }
-drawFace(); applyOutfit(); applyBody();
+function applyCreator(){ player.scale.set(1, CC.height, 1); head.scale.set(CC.head,CC.head,CC.head); drawFace(); }
+function applyBody(){ applyCreator(); } // keep simple
+drawFace(); applyOutfit(); applyCreator();
 
 /* NPCs */
 const npcs=new THREE.Group(); scene.add(npcs);
@@ -259,30 +331,19 @@ function renderNpcList(){
   $('npcList').innerHTML=S.npcs.map(n=>`<div class="card" data-id="${n.id}"><div><div class="name">${n.name}</div><div class="meta">${n.status}</div></div><div class="meta">Rel ${n.rel}</div></div>`).join('');
   $$('#npcList .card').forEach(el=>el.addEventListener('click',()=>{ const n=S.npcs.find(x=>x.id===el.dataset.id); S.sel=n; $('npcActions').style.display='flex'; $('npcName').textContent=`${n.name} • Rel ${n.rel}`; }));
 }
-$('p-relationships').addEventListener('click',e=>{
-  const k=e.target.getAttribute('data-npc'); if(!k) return; const n=S.sel; if(!n) return toast('Pick someone first');
-  if(k==='chat'){ bump('fun',8); addRel(n,5,10); timePass(20); toast('Chatted'); }
-  if(k==='compliment'){ const g=Math.random()<.8?(6+rand(6)):0; addRel(n,g,g); timePass(10); toast(g?'They smiled':'Awkward…'); }
-  if(k==='gift'){ if(S.money<25) return toast('Need $25'); S.money-=25; addRel(n,10,20); timePass(10); toast('They loved it'); }
-  if(k==='date'){ if(S.money<40) return toast('Need $40'); S.money-=40; bump('fun',18); S.clean=clamp(S.clean-6,0,100); S.energy=clamp(S.energy-8,0,100); addRel(n,12,22); timePass(120); if(n.rel>=70&&n.status!=='partner'){n.status='partner'; toast(n.name+' is now your partner ❤️',1600);} }
-  renderNpcList(); setBars();
-});
 
-/* Switch room */
+/* Room switching */
 function resetView(){ player.position.set(0,0,0); camera.position.set(0,5.8,9.5); camera.lookAt(0,1.2,0); target=null; }
 function switchRoom(name,tele){ if(!floors[name]) return; Object.values(floors).forEach(m=>scene.remove(m)); scene.add(floors[name]); S.room=name; room.clear(); room.add(furnFor(name)); drawDoors(name); if(tele) resetView(); }
 
-/* Tap to move + interact */
+/* Tap to move / interact */
 const ray=new THREE.Raycaster(); let target=null;
 $('webgl').addEventListener('pointerdown',e=>{
   const r=$('webgl').getBoundingClientRect(); const x=(e.clientX-r.left)/r.width*2-1, y=-((e.clientY-r.top)/r.height*2-1);
   const m=new THREE.Vector2(x,y); ray.setFromCamera(m,camera);
-  // doors?
   const d=ray.intersectObjects(doorGroup.children,true)[0]; if(d && d.object.userData.to){ switchRoom(d.object.userData.to,true); return; }
-  // furniture interact?
   const f=ray.intersectObjects(room.children,true)[0];
   if(f && f.object.userData.type){ target=f.point.clone(); target.userData=f.object.userData.type; return; }
-  // floor
   const floorHit=ray.intersectObject(floors[S.room],true)[0]; if(floorHit){ target=floorHit.point.clone(); target.userData=null; }
 },{passive:true});
 
@@ -292,19 +353,16 @@ function tick(now){
   const dt=Math.min(50,now-last)/1000; last=now;
   // needs/time
   S.t += S.speed*dt; const s=S.speed/2; S.hunger=clamp(S.hunger+0.25*s*dt,0,100); S.energy=clamp(S.energy-0.18*s*dt,0,100); S.clean=clamp(S.clean-0.10*s*dt,0,100); S.fun=clamp(S.fun-0.08*s*dt,0,100);
-  // spawn npc daily
   const day=Math.floor(S.t/(24*60)); if(day!==S.lastNpcDay){S.lastNpcDay=day; spawnNpc(); renderNpcList();}
   moveNpcs(60*dt);
-
   // move player
   if(target){
     const p=new THREE.Vector3(player.position.x,0,player.position.z), to=target.clone().setY(0), dir=to.clone().sub(p), L=dir.length();
     if(L>0.05){ dir.normalize(); player.position.add(dir.multiplyScalar(2.2*dt)); player.lookAt(to.x,player.position.y,to.z); }
-    else { // reached
-      if(target.userData){ doInteract(target.userData); }
-      target=null;
-    }
+    else { if(target.userData){ doInteract(target.userData); } target=null; }
   }
+  // keep face readable
+  facePlate.lookAt(camera.position);
   followCam();
   setBars();
   R.render(scene,camera);
@@ -313,42 +371,29 @@ function tick(now){
 function followCam(){ const target=new THREE.Vector3(player.position.x,1.2,player.position.z); const pos=new THREE.Vector3(player.position.x,5.8,player.position.z+7.5); camera.position.lerp(pos,0.08); camera.lookAt(target); }
 
 /* Interactions */
-function doInteract(type){
-  if(type==='sleep'){ sleep(); toast('You slept'); }
-  if(type==='shower'){ shower(); toast('Shower done'); }
-  if(type==='eat'){ eat(); toast('Ate a meal'); }
-  if(type==='tv'){ tv(); toast('Watched TV'); }
-}
+function doInteract(type){ if(type==='sleep'){sleep();toast('You slept');} if(type==='shower'){shower();toast('Shower done');} if(type==='eat'){eat();toast('Ate a meal');} if(type==='tv'){tv();toast('Watched TV');} }
 function eat(){ if(S.money<8) return toast('Need $8'); S.money-=8; S.hunger=clamp(S.hunger-35,0,100); S.energy=clamp(S.energy+5,0,100); timePass(20); }
 function sleep(){ let m=0; while(S.energy<95&&m<8*60){ S.energy=clamp(S.energy+1.2,0,100); S.hunger=clamp(S.hunger+0.4,0,100); m+=10;} timePass(m); }
 function shower(){ S.clean=clamp(S.clean+35,0,100); S.energy=clamp(S.energy+2,0,100); timePass(15); }
 function tv(){ S.fun=clamp(S.fun+28,0,100); S.energy=clamp(S.energy-6,0,100); timePass(40); }
 function study(){ if(S.energy<20) return toast('Too tired'); S.edu=clamp(S.edu+6+rand(4),0,100); S.energy=clamp(S.energy-10,0,100); S.fun=clamp(S.fun-4,0,100); timePass(50); }
-function work(){
-  if(!S.job) return toast('No job yet');
-  const j=JOBS[S.job], h=hour(S.t), [o,c]=j.open, open = o<c ? (h>=o&&h<c) : (h>=o||h<c);
+function work(){ if(!S.job) return toast('No job yet'); const j=JOBS[S.job], h=hour(S.t), [o,c]=j.open, open = o<c ? (h>=o&&h<c) : (h>=o||h<c);
   if(!open) return toast('Job closed now');
-  const hrs=2+rand(2), pay=j.pay*hrs + (S.job==='stripper'?rand(80):0);
-  const perf=(S.energy>40?1:0.7)*(S.clean>40?1:0.8); S.money+=Math.floor(pay*perf);
-  S.energy=clamp(S.energy-12*hrs/2,0,100); S.hunger=clamp(S.hunger+10*hrs/2,0,100); S.fun=clamp(S.fun+(S.job==='stripper'?4:-4),0,100); S.clean=clamp(S.clean-6*hrs/2,0,100);
-  timePass(hrs*60); toast(`Worked ${hrs}h, earned $${Math.floor(pay*perf)}`);
-}
+  const hrs=2+rand(2), pay=j.pay*hrs + (S.job==='stripper'?rand(80):0), perf=(S.energy>40?1:0.7)*(S.clean>40?1:0.8);
+  S.money+=Math.floor(pay*perf); S.energy=clamp(S.energy-12*hrs/2,0,100); S.hunger=clamp(S.hunger+10*hrs/2,0,100); S.fun=clamp(S.fun+(S.job==='stripper'?4:-4),0,100); S.clean=clamp(S.clean-6*hrs/2,0,100);
+  timePass(hrs*60); toast(`Worked ${hrs}h, earned $${Math.floor(pay*perf)}`);}
 function clean(){ S.clean=clamp(S.clean+28,0,100); S.energy=clamp(S.energy-5,0,100); timePass(30); }
-function save(){ localStorage.setItem('cozy3d_play',JSON.stringify({S,A})); toast('Saved'); }
-function load(){ const raw=localStorage.getItem('cozy3d_play'); if(!raw) return toast('No save'); try{ const d=JSON.parse(raw); Object.assign(S,d.S||{}); Object.assign(A,d.A||{}); applyOutfit(); applyBody(); drawFace(); setBars(); $('job').textContent=S.job?JOBS[S.job].name:'Unemployed'; switchRoom(S.room,true); toast('Loaded'); }catch{ toast('Load failed'); }}
-
-/* Helpers */
+function save(){ localStorage.setItem('cozy3d_creator',JSON.stringify({S,A,CC})); toast('Saved'); }
+function load(){ const raw=localStorage.getItem('cozy3d_creator'); if(!raw) return toast('No save'); try{ const d=JSON.parse(raw); Object.assign(S,d.S||{}); Object.assign(A,d.A||{}); Object.assign(CC,d.CC||{}); // restore creator
+  // reflect sliders
+  ccHeight.value=CC.height; ccHead.value=CC.head; ccEyeSize.value=CC.eyeSize; ccEyeGap.value=CC.eyeGap; ccNose.value=CC.nose; ccMouth.value=CC.mouth;
+  applyOutfit(); applyCreator(); drawFace(); setBars(); $('job').textContent=S.job?JOBS[S.job].name:'Unemployed'; switchRoom(S.room,true); toast('Loaded'); }catch{ toast('Load failed'); }}
 function setBars(){ $('bEnergy').style.width=S.energy+'%'; $('bHunger').style.width=(100-S.hunger)+'%'; $('bFun').style.width=S.fun+'%'; $('bClean').style.width=S.clean+'%'; $('bEdu').style.width=S.edu+'%'; $('bRep').style.width=S.rep+'%'; $('money').textContent=Math.floor(S.money); $('clock').textContent=timeFmt(S.t); $('job').textContent=S.job?JOBS[S.job].name:'Unemployed'; }
 function bump(k,v){ S[k]=clamp(S[k]+v,0,100); }
 function timePass(m){ S.t+=m; }
 function fmtHours([o,c]){ const f=h=>h===0?'12a':(h<12?`${h}a`:(h===12?'12p':`${h-12}p`)); return `${f(o)}–${f(c)}` }
 function randName(){const a=['Alex','Jordan','Taylor','Riley','Casey','Avery','Kai','Skye','Nina','Malik','Jada','Imani','Noah']; return a[rand(a.length)]+' '+(Math.random()<0.5?'B.':'C.');}
 function cryptoRandom(){return Math.random().toString(36).slice(2); }
-function toast(msg,ms=1200){const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._h); toast._h=setTimeout(()=>t.hidden=true,ms);}
-
-/* Actions map for UI buttons */
-function eat(){return arguments.callee.caller?null:0} // (placeholder for linter)
-const actions={eat,sleep,shower,tv,study,work,clean,save};
 
 /* Boot */
 function boot(){ switchRoom('living',true); spawnNpc(); renderNpcList(); setBars(); requestAnimationFrame(tick); }
